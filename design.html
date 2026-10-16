@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NyayaRoute | Visual Mockup</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1a1c1b",
+                        "on-tertiary-fixed": "#111c2c",
+                        "on-secondary-fixed-variant": "#594325",
+                        "secondary-fixed": "#ffddb6",
+                        "surface-bright": "#faf9f7",
+                        "secondary-fixed-dim": "#e2c19b",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#bcc7dd",
+                        "on-surface-variant": "#44474d",
+                        "surface-container": "#efeeec",
+                        "outline-variant": "#c5c6ce",
+                        "tertiary-fixed": "#d8e3fa",
+                        "tertiary-container": "#111c2c",
+                        "primary-container": "#0c1b33",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#291801",
+                        "on-secondary-container": "#785e3e",
+                        "surface": "#faf9f7",
+                        "primary-fixed-dim": "#b9c7e6",
+                        "background": "#faf9f7",
+                        "outline": "#75777e",
+                        "on-background": "#1a1c1b",
+                        "surface-container-low": "#f4f3f1",
+                        "inverse-primary": "#b9c7e6",
+                        "tertiary": "#000000",
+                        "inverse-on-surface": "#f1f1ef",
+                        "on-primary-container": "#7684a1",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e3e2e0",
+                        "surface-container-high": "#e9e8e6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#fddab2",
+                        "inverse-surface": "#2f3130",
+                        "surface-variant": "#e3e2e0",
+                        "primary": "#000000",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#515f7a",
+                        "on-primary-fixed": "#0c1b33",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "surface-dim": "#dadad8",
+                        "secondary": "#735a3a",
+                        "on-tertiary-container": "#798499",
+                        "on-primary-fixed-variant": "#394761",
+                        "primary-fixed": "#d7e3ff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "caption": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(197, 198, 206, 0.2);
+        }
+
+        .stagger-in>* {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .stagger-in>*:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-in>*:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-in>*:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-in>*:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .divider-line {
+            height: 1px;
+            background-color: #0c1b33;
+            opacity: 0.1;
+            width: 100%;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(215, 227, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+    <div class="bg-amber-100 text-amber-950 text-center px-4 py-3 text-sm font-semibold">
+        Visual design mockup only. The figures, alerts, and sample queries on this page are not live NyayaRoute data.
+    </div>
+    <!-- Procedural Background Shader -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none opacity-40">
+        <!-- STITCH_SHADER_START:ANIMATION_26 class="w-full h-full" -->
+        <div class="w-full h-full" style="display:block;">
+            <canvas id="shader-canvas-ANIMATION_26" style="display:block;width:100%;height:100%"></canvas>
+            <script>
+                    (function () {
+                        const canvas = document.getElementById('shader-canvas-ANIMATION_26');
+
+                        // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+                        // This fires on initial layout and whenever the element is resized.
+                        function syncSize() {
+                            const w = canvas.clientWidth || 1280;
+                            const h = canvas.clientHeight || 720;
+                            if (canvas.width !== w || canvas.height !== h) {
+                                canvas.width = w;
+                                canvas.height = h;
+                            }
+                        }
+                        if (typeof ResizeObserver !== 'undefined') {
+                            new ResizeObserver(syncSize).observe(canvas);
+                        }
+                        syncSize();
+
+                        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                        if (!gl) return;
+                        const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+                        const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+
+void main() {
+    vec2 uv = v_texCoord;
+    vec2 mouse = u_mouse / u_resolution;
+    
+    // Create a fluid, institutional background with a deep navy palette
+    // Mixing sine waves for a subtle "liquid metal" or "ink" effect
+    float motion = sin(uv.x * 2.5 + u_time * 0.15) * 0.5 + 0.5;
+    motion += sin(uv.y * 3.2 - u_time * 0.2) * 0.5 + 0.5;
+    motion += sin(distance(uv, mouse) * 5.0 - u_time * 0.4) * 0.3;
+    
+    // Lexington & Grey Palette stops
+    vec3 deepNavy = vec3(0.047, 0.106, 0.2); // #0c1b33
+    vec3 slate = vec3(0.15, 0.18, 0.22);
+    vec3 black = vec3(0.02, 0.04, 0.08);
+    
+    vec3 color = mix(deepNavy, slate, motion * 0.4);
+    color = mix(color, black, sin(u_time * 0.1) * 0.5 + 0.5);
+    
+    // Subtle vignette to focus on content
+    float vignette = 1.0 - length(uv - 0.5) * 0.8;
+    
+    gl_FragColor = vec4(color * vignette, 1.0);
+}`;
+                        function cs(type, src) {
+                            const s = gl.createShader(type);
+                            gl.shaderSource(s, src);
+                            gl.compileShader(s);
+                            return s;
+                        }
+                        const prog = gl.createProgram();
+                        gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+                        gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+                        gl.linkProgram(prog);
+                        gl.useProgram(prog);
+                        const buf = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+                        const pos = gl.getAttribLocation(prog, 'a_position');
+                        gl.enableVertexAttribArray(pos);
+                        gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+                        const uTime = gl.getUniformLocation(prog, 'u_time');
+                        const uRes = gl.getUniformLocation(prog, 'u_resolution');
+                        const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+                        // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+                        // Shaders that need normalized coords should use: u_mouse / u_resolution.
+                        let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+                        window.addEventListener('mousemove', (event) => {
+                            const rect = canvas.getBoundingClientRect();
+                            if (rect.width && rect.height) {
+                                const nx = (event.clientX - rect.left) / rect.width;
+                                const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+                                mouse.x = nx * canvas.width;
+                                mouse.y = ny * canvas.height;
+                            }
+                        });
+
+                        function render(t) {
+                            if (typeof ResizeObserver === 'undefined') syncSize();
+                            gl.viewport(0, 0, canvas.width, canvas.height);
+                            if (uTime) gl.uniform1f(uTime, t * 0.001);
+                            if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+                            if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+                            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                            requestAnimationFrame(render);
+                        }
+                        render(0);
+                    })();
+            </script>
+        </div>
+        <!-- STITCH_SHADER_END:ANIMATION_26 -->
+    </div>
+    <!-- TopNavBar -->
+    <header class="w-full top-0 sticky z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+        <nav
+            class="flex justify-between items-center w-full px-margin-desktop py-unit max-w-container-max mx-auto h-20">
+            <div class="flex items-center gap-8">
+                <span
+                    class="text-headline-md font-headline-md text-primary uppercase tracking-widest cursor-pointer">NYAYAROUTE</span>
+                <div class="hidden md:flex items-center gap-6">
+                    <a class="text-label-md font-label-md text-primary border-b border-primary pb-1 transition-colors duration-300"
+                        href="#">Research</a>
+                    <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors duration-300"
+                        href="#">Precedents</a>
+                    <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors duration-300"
+                        href="#">Library</a>
+                    <a class="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors duration-300"
+                        href="#">Archive</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 text-on-surface-variant">
+                    <span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors"
+                        data-icon="account_balance">account_balance</span>
+                    <span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors"
+                        data-icon="settings">settings</span>
+                </div>
+                <button
+                    class="bg-primary-container text-on-primary-container px-6 py-2 text-label-md font-label-md uppercase tracking-wider transition-all active:opacity-70 hover:bg-primary-container/90">
+                    New Query
+                </button>
+            </div>
+        </nav>
+    </header>
+    <main class="relative">
+        <!-- Hero Section: Institutional Anchor -->
+        <section
+            class="relative min-h-[90vh] flex flex-col justify-center px-margin-desktop max-w-container-max mx-auto py-gutter overflow-hidden">
+            <div class="grid grid-cols-12 gap-gutter items-center">
+                <div class="col-span-12 lg:col-span-7 stagger-in">
+                    <span class="text-label-md font-label-md text-primary uppercase tracking-[0.3em] mb-6 block">Legacy
+                        of Intelligence</span>
+                    <h1 class="font-display-lg text-display-lg text-primary max-w-2xl mb-8 leading-[1.05]">
+                        Institutional <br />
+                        <span class="italic font-serif">Authority</span> in Legal <br />
+                        Jurisprudence.
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-12">
+                        NyayaRoute delivers sovereign-grade insights, synthesizing centuries of precedents with the
+                        computational precision of modern legal technology.
+                    </p>
+                    <div class="flex gap-4">
+                        <button
+                            class="bg-primary px-8 py-4 text-on-primary font-label-md uppercase tracking-widest hover:bg-on-surface transition-all">Begin
+                            Inquiry</button>
+                        <button
+                            class="border border-outline px-8 py-4 text-primary font-label-md uppercase tracking-widest hover:bg-surface-container transition-all">White
+                            Papers</button>
+                    </div>
+                </div>
+                <!-- 3D Pillar & Image Stack -->
+                <div class="col-span-12 lg:col-span-5 relative h-[600px] flex items-center justify-center">
+                    <div class="absolute inset-0 z-0 opacity-20 transform translate-x-12 translate-y-12">
+                        <img class="w-full h-full object-cover grayscale opacity-50"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNx9aSeCyzJHRRSK6jXTLXopRcNYyMbXmfCOkdPnqPQlNfAqHu23AYEp0gI4PnhE_RSDtPOskh4keayWBenk-EzlDf8fgzkF6gXFMYgupZ24c0cpPIx8RIE6caZKeRDvoogH4TbozYvEpcazP0LNqhp6DSC22VgaXXDKKx84VPVBCrekE8LidmDav_MkClWeZQHzqUfst96HiwWuWbDlDKWCRFsHxo1xaouO6Bb7UFpbNhFdBTexEBuufV1qPCrWkr6bmGT2B27w" />
+                    </div>
+                    <div class="relative z-10 w-full h-full">
+                        <!-- STITCH_THREEJS_START:ANIMATION_27 class="w-full h-full" -->
+                        <div class="w-full h-full" style="display:block;">
+                            <script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+                            <div id="threejs-container-ANIMATION_27" style="width:100%;height:100%"></div>
+                            <script>
+                                (function () {
+                                    const container = document.getElementById('threejs-container-ANIMATION_27');
+                                    const devicePixelRatio = window.devicePixelRatio || 1;
+                                    (function () {
+                                        const container = document.getElementById('threejs-container-ANIMATION_OBJ'); // Will be replaced by system
+                                        const width = container.clientWidth || window.innerWidth;
+                                        const height = container.clientHeight || window.innerHeight;
+
+                                        const scene = new THREE.Scene();
+                                        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                                        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+                                        renderer.setSize(width, height);
+                                        renderer.setPixelRatio(window.devicePixelRatio);
+                                        container.appendChild(renderer.domElement);
+
+                                        // Group for the Indian Pillar (Ashoka inspired)
+                                        const group = new THREE.Group();
+
+                                        const ivoryMaterial = new THREE.MeshPhongMaterial({
+                                            color: 0xfaf9f7,
+                                            shininess: 80,
+                                            specular: 0x0c1b33
+                                        });
+
+                                        const goldMaterial = new THREE.MeshPhongMaterial({
+                                            color: 0xd4af37, // Gold for details
+                                            shininess: 100,
+                                            metalness: 0.8
+                                        });
+
+                                        // Pillar Base
+                                        const baseGeo = new THREE.CylinderGeometry(0.8, 1, 0.4, 32);
+                                        const base = new THREE.Mesh(baseGeo, ivoryMaterial);
+                                        base.position.y = -2;
+                                        group.add(base);
+
+                                        // Pillar Shaft
+                                        const shaftGeo = new THREE.CylinderGeometry(0.5, 0.6, 3, 32);
+                                        const shaft = new THREE.Mesh(shaftGeo, ivoryMaterial);
+                                        shaft.position.y = -0.3;
+                                        group.add(shaft);
+
+                                        // Capital (Top decorative part)
+                                        const capitalGeo = new THREE.CylinderGeometry(0.7, 0.5, 0.6, 32);
+                                        const capital = new THREE.Mesh(capitalGeo, ivoryMaterial);
+                                        capital.position.y = 1.5;
+                                        group.add(capital);
+
+                                        // Abstract top piece
+                                        const topGeo = new THREE.SphereGeometry(0.4, 32, 32);
+                                        const top = new THREE.Mesh(topGeo, ivoryMaterial);
+                                        top.position.y = 2;
+                                        group.add(top);
+
+                                        scene.add(group);
+
+                                        const ambientLight = new THREE.AmbientLight(0x404040, 2);
+                                        scene.add(ambientLight);
+
+                                        const pointLight = new THREE.PointLight(0xffffff, 2);
+                                        pointLight.position.set(5, 5, 5);
+                                        scene.add(pointLight);
+
+                                        camera.position.z = 6;
+
+                                        let mouseX = 0;
+                                        let mouseY = 0;
+
+                                        window.addEventListener('mousemove', (event) => {
+                                            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                                            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                                        });
+
+                                        function animate() {
+                                            requestAnimationFrame(animate);
+
+                                            // Responsive rotation
+                                            group.rotation.y += (mouseX * 0.4 - group.rotation.y) * 0.05;
+                                            group.rotation.x += (mouseY * 0.2 - group.rotation.x) * 0.05;
+
+                                            // Looping float
+                                            group.position.y = Math.sin(Date.now() * 0.001) * 0.15;
+
+                                            renderer.render(scene, camera);
+                                        }
+
+                                        window.addEventListener('resize', () => {
+                                            const w = container.clientWidth || window.innerWidth;
+                                            const h = container.clientHeight || window.innerHeight;
+                                            renderer.setSize(w, h);
+                                            camera.aspect = w / h;
+                                            camera.updateProjectionMatrix();
+                                        });
+
+                                        animate();
+                                    })();
+                                })();
+                            </script>
+                        </div>
+                        <!-- STITCH_THREEJS_END:ANIMATION_27 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Institutional Access: Search Interface -->
+        <section class="bg-primary-container py-32 px-margin-desktop overflow-hidden">
+            <div class="max-w-container-max mx-auto">
+                <div class="grid grid-cols-12 gap-gutter items-end mb-16">
+                    <div class="col-span-12 md:col-span-8">
+                        <h2 class="font-headline-lg text-headline-lg text-on-primary mb-4">Institutional Access</h2>
+                        <p class="font-body-md text-on-primary-container max-w-lg">Execute complex thematic searches
+                            across the unified codebase of federal and state statutes.</p>
+                    </div>
+                    <div class="col-span-12 md:col-span-4 text-right">
+                        <span
+                            class="text-caption font-caption text-on-primary-container uppercase tracking-widest">System
+                            Status: Optimal</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-2 flex items-center gap-4">
+                    <span class="material-symbols-outlined text-on-primary-container ml-6"
+                        data-icon="search">search</span>
+                    <input
+                        class="flex-grow bg-transparent border-none text-white font-headline-md placeholder:text-on-primary-container/50 focus:ring-0 py-6"
+                        placeholder="Query the Code: fundamental rights under environmental distress..." type="text" />
+                    <button
+                        class="bg-white text-primary-container font-label-md uppercase px-12 py-6 mr-1 transition-transform hover:scale-[0.99] active:scale-95">Analyze</button>
+                </div>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <span class="text-caption text-on-primary-container uppercase">Trending Queries:</span>
+                    <a class="text-caption text-white underline underline-offset-4 decoration-primary-fixed-dim hover:text-primary-fixed-dim transition-colors"
+                        href="#">Digital Privacy Act 2024</a>
+                    <a class="text-caption text-white underline underline-offset-4 decoration-primary-fixed-dim hover:text-primary-fixed-dim transition-colors"
+                        href="#">Land Reform Precedents</a>
+                    <a class="text-caption text-white underline underline-offset-4 decoration-primary-fixed-dim hover:text-primary-fixed-dim transition-colors"
+                        href="#">Maritime Jurisdiction</a>
+                </div>
+            </div>
+        </section>
+        <!-- Sovereign Authority Section -->
+        <section class="py-32 px-margin-desktop max-w-container-max mx-auto">
+            <div class="grid grid-cols-12 gap-gutter items-center">
+                <div class="col-span-12 lg:col-span-6 order-2 lg:order-1">
+                    <div class="relative group">
+                        <img class="w-full aspect-[4/5] object-cover border border-outline/20"
+                            data-alt="A macro photograph of the original Constitution of India, highlighting the intricate gold leaf embossing and the national emblem. The lighting is warm and dramatic, emphasizing the aged parchment texture and the prestige of the document. The background is a rich, dark mahogany wood, creating a white-shoe law firm atmosphere of heritage and absolute precision."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfT2gwdLmvNvWIdNSmV36jL4RH3lPz3LbqoA_30OhVHTLGz6U96vrxIN5IWkgUOU147AT4vAnncgOu7sooE92DwQ7OecqgLf-2PPm_hIqylrxMk5_bE9tim-0mpf7QmQJg_uQ3pNyit6_P7i_dg9Q9KaeInPwTNQZPSCf7lOpHiW4UBpzV9WmhW9XtxU2Ln1eBPMtrH1dpQ517xKeAk8Z6wUO4rGicK47gDd0Z7WWgVXWLMcj-kZY05B9mawuaBdnfZZJHSGLyQg" />
+                        <div class="absolute -bottom-8 -right-8 glass-panel p-8 max-w-xs shadow-2xl">
+                            <h4 class="font-headline-md text-headline-md text-primary mb-2">Original Context</h4>
+                            <p class="font-caption text-on-surface-variant">Deep-layered analysis of foundational texts
+                                against contemporary legislative shifts.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 lg:col-span-5 lg:offset-1 order-1 lg:order-2 stagger-in">
+                    <span
+                        class="text-label-md font-label-md text-secondary uppercase tracking-widest mb-6 block">Sovereign
+                        Authority</span>
+                    <h2 class="font-display-lg text-headline-lg text-primary mb-8">Architectural Guardians of Justice.
+                    </h2>
+                    <div class="divider-line mb-8"></div>
+                    <div class="space-y-6">
+                        <div class="flex gap-6">
+                            <span class="font-headline-md text-primary-container opacity-30">01</span>
+                            <div>
+                                <h3 class="font-headline-md text-headline-md text-primary mb-2">Fundamental Rights</h3>
+                                <p class="text-body-md text-on-surface-variant">Automated mapping of case law history to
+                                    individual liberties for immediate legal standing assessment.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <span class="font-headline-md text-primary-container opacity-30">02</span>
+                            <div>
+                                <h3 class="font-headline-md text-headline-md text-primary mb-2">Institutional Anchor
+                                </h3>
+                                <p class="text-body-md text-on-surface-variant">Linking Supreme Court directives to
+                                    administrative actions with 99.8% verification accuracy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Digital Jurisprudence: Asymmetric Bento -->
+        <section class="py-32 px-margin-desktop bg-surface-container-low border-y border-outline-variant/30">
+            <div class="max-w-container-max mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                    <div class="max-w-2xl">
+                        <h2 class="font-display-lg text-headline-lg text-primary mb-4">Digital Jurisprudence</h2>
+                        <p class="font-body-lg text-on-surface-variant">The fusion of computational speed and
+                            constitutional wisdom. Our AI-driven engine deciphers complex patterns across millions of
+                            filings.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="p-4 bg-white border border-outline/20 flex flex-col items-center justify-center w-32 h-32">
+                            <span class="font-headline-md text-primary">2.4M</span>
+                            <span class="text-caption uppercase tracking-tighter">Records</span>
+                        </div>
+                        <div
+                            class="p-4 bg-white border border-outline/20 flex flex-col items-center justify-center w-32 h-32">
+                            <span class="font-headline-md text-primary">0.4s</span>
+                            <span class="text-caption uppercase tracking-tighter">Latency</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-8">
+                    <div
+                        class="col-span-12 lg:col-span-4 bg-white p-12 border border-outline/10 flex flex-col justify-between group hover:border-primary transition-all duration-500">
+                        <div>
+                            <div class="mb-8 w-16 h-16 bg-surface-container flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary scale-150"
+                                    data-icon="insights">insights</span>
+                            </div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">Real-time Analytics</h3>
+                            <p class="text-body-md text-on-surface-variant">Monitor live litigation trends across 12
+                                high courts with predictive outcome modeling.</p>
+                        </div>
+                        <a class="mt-8 text-label-md font-label-md uppercase tracking-widest text-primary flex items-center gap-2 group-hover:gap-4 transition-all"
+                            href="#">
+                            View Engine <span class="material-symbols-outlined"
+                                data-icon="arrow_right_alt">arrow_right_alt</span>
+                        </a>
+                    </div>
+                    <div class="col-span-12 lg:col-span-8 relative overflow-hidden h-[450px]">
+                        <img class="absolute inset-0 w-full h-full object-cover"
+                            data-alt="A hyper-realistic, premium 3D icon of a judge's gavel integrated with glowing circuit board patterns. The aesthetic is extremely polished with brushed metal textures and subtle blue neon accents highlighting the data pathways. It rests on a deep navy textured background, symbolizing the intersection of traditional law and future-forward digital jurisprudence."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB1yQ2dYvTmZQj3XebvzDtvTx2IM6zwGFD7E8TrCScWTVnWwJz7woMEWW4LD55V4KJcYDZApKFg4jTozWSpNWtnb-XrN8xtu4qyGZYfxj8HU-czJQf0pudUkVFWOUsltoy4-W_FivCD3IAOhJZrm8TJA3d9VuCECShjJNHfdF-XFfy5Et_0CBzDLsGVcrqwoDYto2JybhNpG5rSR7otOQt0Z6ETFDhSpIzqvGl_sBkEbg3X_Re-iOYyOY2UN3eEVJCQH7nChz8yw" />
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-primary-container/80 to-transparent flex flex-col justify-end p-12">
+                            <h3 class="font-headline-md text-headline-lg text-white mb-4">Research at the Speed of
+                                Thought</h3>
+                            <p class="text-body-lg text-on-primary-container max-w-xl">Our proprietary Neural-Legal
+                                network processes natural language inquiries into actionable briefs in under 60 seconds.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Live Analysis Cards -->
+                    <div class="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                        <div class="glass-panel p-8 border-l-4 border-l-primary">
+                            <span
+                                class="text-caption text-secondary font-bold uppercase tracking-widest block mb-4">Conflict
+                                Alert</span>
+                            <p class="text-body-md text-on-surface italic mb-4">"Potential precedent mismatch in Sector
+                                14 land dispute filing relative to SC 2023 ruling."</p>
+                            <span class="text-caption text-on-surface-variant">Source: AI Auditor • 2m ago</span>
+                        </div>
+                        <div class="glass-panel p-8 border-l-4 border-l-outline">
+                            <span class="text-caption text-primary font-bold uppercase tracking-widest block mb-4">Live
+                                Analysis</span>
+                            <p class="text-body-md text-on-surface mb-4">Statutory cross-reference complete for the New
+                                Telecommunications Bill (2024).</p>
+                            <span class="text-caption text-on-surface-variant">Status: Finalizing Synthesis</span>
+                        </div>
+                        <div class="glass-panel p-8 border-l-4 border-l-on-secondary-container">
+                            <span
+                                class="text-caption text-secondary font-bold uppercase tracking-widest block mb-4">System
+                                Update</span>
+                            <p class="text-body-md text-on-surface mb-4">Vault integration for the Maharashtra State
+                                Archive now fully indexed.</p>
+                            <span class="text-caption text-on-surface-variant">Coverage: +450k Documents</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Final CTA: Institutional Access -->
+        <section class="py-32 px-margin-desktop text-center">
+            <div class="max-w-2xl mx-auto stagger-in">
+                <span class="text-label-md font-label-md text-primary uppercase tracking-[0.4em] mb-6 block">Inquire
+                    Within</span>
+                <h2 class="font-display-lg text-headline-lg text-primary mb-8">Secure Your Institutional Seat.</h2>
+                <p class="text-body-lg text-on-surface-variant mb-12">Enter the next echelon of digital jurisprudence
+                    with enterprise-grade security and absolute precision.</p>
+                <div class="flex justify-center gap-8 items-center">
+                    <div class="h-px w-24 bg-primary opacity-20"></div>
+                    <button
+                        class="bg-primary text-on-primary px-12 py-5 font-label-md uppercase tracking-widest hover:scale-105 transition-transform duration-300">Request
+                        Access</button>
+                    <div class="h-px w-24 bg-primary opacity-20"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface border-t border-outline-variant/30">
+        <div
+            class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-gutter max-w-container-max mx-auto gap-8">
+            <div class="text-caption font-caption text-on-surface-variant uppercase tracking-wider">
+                © 2024 NYAYAROUTE INTERNATIONAL. ALL RIGHTS RESERVED.
+            </div>
+            <div class="flex gap-8">
+                <a class="text-caption font-caption text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-all uppercase tracking-wider"
+                    href="#">Terms of Service</a>
+                <a class="text-caption font-caption text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-all uppercase tracking-wider"
+                    href="#">Privacy Protocol</a>
+                <a class="text-caption font-caption text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-all uppercase tracking-wider"
+                    href="#">Compliance</a>
+                <a class="text-caption font-caption text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-all uppercase tracking-wider"
+                    href="#">Institutional Contact</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Micro-interactions and subtle scroll effects
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.stagger-in').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>

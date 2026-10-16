@@ -1,0 +1,9 @@
+.env
+.a/
+__pycache__/
+*.py[cod]
+data/legal_corpus.jsonl
+data/pdf_manifest.json
+data/faiss.index
+data/metadata.pkl
+.streamlit/secrets.toml
