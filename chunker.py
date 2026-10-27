@@ -34,7 +34,7 @@ CONSTITUTION_NUMBERED_ARTICLE_RE = re.compile(
 # Real Acts typically number sections as "3. Short title and commencement.—"
 # rather than spelling out the word "Section". Capture both styles.
 NUMBERED_SECTION_RE = re.compile(
-    r"(?:^|\n)\s*(\d{1,4}[A-Za-z]{0,2})\.\s+([A-Z][^\n]{2,150}?)(?:\.[—\-]|\.\s|\n)", re.MULTILINE
+    r"(?:^|\n)\s*(\d{1,4}[A-Za-z]{0,2})\.\s+([A-Z][^\n]{2,150}?)(?:\.[—\-]|\.\s|\.|\n|$)", re.MULTILINE
 )
 EXPLICIT_SECTION_RE = re.compile(
     r"(?:^|\n)\s*Section[s]?\s+(\d{1,4}[A-Za-z]{0,2})\.?\s*([A-Z][^\n.]{0,150})?", re.MULTILINE
@@ -77,6 +77,9 @@ class StructuralChunk:
 
 def detect_document_kind(text: str) -> str:
     """Detect whether a document is a Constitution, judgment, or Act."""
+    is_constitution_title = bool(
+        re.search(r"constitution\s+of\s+india|we,\s+the\s+people\s+of\s+india", text[:2500], re.I)
+    )
 
     article_hits = len(ARTICLE_RE.findall(text))
     constitution_numbered_hits = len(
@@ -89,16 +92,14 @@ def detect_document_kind(text: str) -> str:
     explicit_section_hits = len(EXPLICIT_SECTION_RE.findall(text))
     section_hits = max(numbered_section_hits, explicit_section_hits)
 
-    # Explicit "Article 21" style.
+    # Explicit "Article 21" style
     if article_hits >= 3:
         return "constitution"
 
-    # Numbered Constitution style.
-    # The presence of PART markers + many numbered article headings
-    # is a strong signal that this is the Constitution.
+    # Numbered Constitution style: must have Constitution title/preamble
+    # or clear Constitution markers to prevent misclassifying Acts/Rules with 'PART' markers.
     part_hits = len(PART_RE.findall(text))
-
-    if constitution_numbered_hits >= 10 and part_hits >= 1:
+    if is_constitution_title and constitution_numbered_hits >= 5 and part_hits >= 1:
         return "constitution"
 
     if judgment_hits >= 3 and judgment_hits >= article_hits:
@@ -107,7 +108,12 @@ def detect_document_kind(text: str) -> str:
     if section_hits >= 3:
         return "act"
 
+    # If title says Constitution even with fewer markers
+    if is_constitution_title and constitution_numbered_hits >= 3:
+        return "constitution"
+
     return "generic"
+
 
 
 def _preceding_marker(matches: list[re.Match], position: int) -> str | None:
@@ -267,8 +273,13 @@ def _chunk_generic(text: str, size: int = 900, overlap: int = 150) -> list[Struc
             if len(body) >= MIN_CHUNK_CHARS:
                 chunks.append(StructuralChunk(text=body, structure_kind="generic", order=order))
                 order += 1
-            # keep a small tail for overlap/context continuity
-            tail = body[-overlap:] if overlap else ""
+            # keep a small tail on word boundaries for overlap/context continuity
+            if overlap and len(body) > overlap:
+                slice_pt = len(body) - overlap
+                space_idx = body.find(" ", slice_pt)
+                tail = body[space_idx + 1:].strip() if space_idx != -1 else body[slice_pt:].strip()
+            else:
+                tail = ""
             buffer = [tail] if tail else []
             buffer_len = len(tail)
         buffer.append(para)

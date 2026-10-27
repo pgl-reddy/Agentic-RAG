@@ -34,7 +34,7 @@ import rag_engine
 from rag_engine import LegalRetriever, load_corpus, run_agent, _tokens, STOPWORDS
 
 INDIC_LEGAL_QA_PATH = _root / "data" / "indic_legal_qa_10k.json"
-FALLBACK_DOWNLOADS_PATH = Path(r"C:\Users\EG SERIES\Downloads\IndicLegalQA Dataset_10K.json")
+FALLBACK_DOWNLOADS_PATH = Path.home() / "Downloads" / "IndicLegalQA Dataset_10K.json"
 
 
 def load_indic_legal_qa() -> list[dict[str, Any]]:

@@ -1,0 +1,329 @@
+PRESENTATION: Robin MPS FINAL PPT-MPS (1).pptx
+Slide Dimensions: 18288000 x 10287000
+
+==================================================
+SLIDE 1
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Freeform 3] (type: FREEFORM (5))
+  Shape 3 [Group 4] (type: GROUP (6))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - DEEP LEARNING SOLUTIONS FOR  PHISHING BY URL DETECTION
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - PROJECT GUIDE:
+    - DR. K. SANTHI SREE
+    - PROFESSOR & HEAD,DIT
+    - UCESTH,JNTUH.
+  Shape 7 [TextBox 10] (type: TEXT_BOX (17))
+    - PRESENTED BY:
+    - M.ROBIN RAJ PAUL
+    - 23011D6403
+    - CNIS,M.TECH,DIT
+    - UCESTH,JNTUH.
+  Shape 8 [Freeform 11] (type: FREEFORM (5))
+
+==================================================
+SLIDE 2
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [TextBox 6] (type: TEXT_BOX (17))
+    - TABLE OF CONTENTS
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - 03
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - 04
+  Shape 7 [TextBox 10] (type: TEXT_BOX (17))
+    - 05
+  Shape 8 [TextBox 11] (type: TEXT_BOX (17))
+    - 07
+  Shape 9 [TextBox 12] (type: TEXT_BOX (17))
+    - 08
+  Shape 10 [TextBox 13] (type: TEXT_BOX (17))
+    - 12
+  Shape 11 [TextBox 14] (type: TEXT_BOX (17))
+    - 10
+  Shape 12 [TextBox 15] (type: TEXT_BOX (17))
+    - ABSTRACT
+  Shape 13 [TextBox 16] (type: TEXT_BOX (17))
+    - INTRODUCTION
+  Shape 14 [TextBox 17] (type: TEXT_BOX (17))
+    - EXISTING WORK
+  Shape 15 [TextBox 18] (type: TEXT_BOX (17))
+    - PROPOSED WORK
+  Shape 16 [TextBox 19] (type: TEXT_BOX (17))
+    - DATASET
+  Shape 17 [TextBox 20] (type: TEXT_BOX (17))
+    - CONCLUSION
+  Shape 18 [TextBox 21] (type: TEXT_BOX (17))
+    - REFERENCES
+  Shape 19 [TextBox 22] (type: TEXT_BOX (17))
+    - EXPERIMENTAL
+    - RESULTS
+  Shape 20 [TextBox 23] (type: TEXT_BOX (17))
+    - 18
+  Shape 21 [TextBox 24] (type: TEXT_BOX (17))
+    - ARCHITECTURE
+  Shape 22 [TextBox 25] (type: TEXT_BOX (17))
+    - 19
+  Shape 23 [TextBox 26] (type: TEXT_BOX (17))
+    - METHODOLOGY
+  Shape 24 [TextBox 27] (type: TEXT_BOX (17))
+    - 11
+
+==================================================
+SLIDE 3
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - ABSTRACT
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - Phishing is when attackers send scam emails (or text messages) that contain links to malicious websites. The websites may contain malware (such as ransomware) which can sabotage systems and organisations.
+    - This Project proposes possible solutions for detecting such phishing URLs using deep learning models accurately.It also performs a comparative study between Machine Learning and Deep Learning Techniques by focusing on one technique from machine learning namely Naive Bayes and two from deep learning namely Recurrent Neural Networks and Convolutional Neural Networks.
+    - This research underscores the effectiveness of deep learning algorithms, particularly in enhancing cybersecurity in the face of evolving cyber threats.
+
+==================================================
+SLIDE 4
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - INTRODUCTION
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - 1. Phishing attacks, through deceptive emails or text messages, pose a persistent cybersecurity threat.
+    - 2. Malicious websites associated with phishing often host dangerous malware, such as ransomware.
+    - 3. This project explores cutting-edge solutions using deep learning models for phishing URL detection.
+    - 4. It conducts a comparative analysis between traditional Machine Learning and advanced Deep Learning techniques, including Naive Bayes and Recurrent Neural Networks and Convolutional Neural Networks.
+    - 5. Deep Learning algorithms play a crucial role in fortifying cybersecurity against evolving threats.
+
+==================================================
+SLIDE 5
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXISTING WORK
+
+==================================================
+SLIDE 6
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXISTING WORK
+
+==================================================
+SLIDE 7
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - PROPOSED WORK
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - This project aims at achieving the following tasks:
+    - - Develop and compare machine learning models (Gaussian Naive Bayes, RNN, CNN) for classification tasks using a CSV dataset.
+    - - Preprocess data by encoding categorical variables, visualizing label distributions, and standardizing data for deep learning models.
+    - - Evaluate models using metrics such as Accuracy, Precision, Recall, and F1 score to assess performance.
+    - - Visualize training progress of RNN and CNN models over epochs to monitor learning and convergence.
+    - - Determine the most effective model architecture and approach for accurate classification based on evaluation metrics and visualized results.
+
+==================================================
+SLIDE 8
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - DATASET
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - The dataset used for this project is the PHI-2018 Phishing URL Dataset,This dataset holds a vast collection of URLs that have numerous features and other properties that can be exploited in order to train and evaluate the models in such a manner that they are extremely capable of detecting any kind of phishing attacks. This dataset has a total of 2,35,794 entries and also has 56 features to choose from.
+    - Type: CSV
+    - Features:
+    - FILENAME, URL, URLLength, Domain, DomainLength, IsDomainIP, TLD, URLSimilarityIndex, CharContinuationRate, TLDLegitimateProb, NoOfSubDomain, HasObfuscation, IsHTTPS, NoOfImage, NoOfCSS, NoOfJS, label
+
+==================================================
+SLIDE 9
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Table 8] (type: TABLE (19))
+    [TABLE]
+      | FILE NAME | URL | URLLength | Domain | Domain Length | IsDomainIP | TLD | URLSimilarityIndex | CharContinuationRate | TLDLegitimateProb | label |
+      | 521848.txt | https://www.southbankmosaics.com | 31 | www.southbankmosaics.com | 24 | 0 | com | 100.0 | 1.000000 | 0.522907 | 1 |
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - DATASET
+
+==================================================
+SLIDE 10
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - METHODOLOGY
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - The methodology surrounding the project involves implementing all the following steps:
+    - 1.Data Loading and Preprocessing
+    - 2.Data Splitting
+    - 3.Naive Bayes Classifier
+    - 4.RNN Model
+    - 5.Improved CNN Model
+    - 6.Performance Comparison and Visualization
+
+==================================================
+SLIDE 11
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - ARCHITECTURE
+
+==================================================
+SLIDE 12
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+
+==================================================
+SLIDE 13
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [Freeform 9] (type: FREEFORM (5))
+  Shape 7 [TextBox 10] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+
+==================================================
+SLIDE 14
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+
+==================================================
+SLIDE 15
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+
+==================================================
+SLIDE 16
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [Freeform 8] (type: FREEFORM (5))
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+
+==================================================
+SLIDE 17
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - EXPERIMENTAL RESULTS
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - The Implemented System outperforms the existing systems in the following ways:
+    - - Uses deep learning models (CNN and RNN) that learn from data and adapt to new phishing methods, moving beyond static rules for better flexibility.
+    - - Focuses on analyzing content instead of visual appearance, which helps handle changes in phishing site designs and improves efficiency.
+    - - Employs deep learning models trained on large datasets for more comprehensive coverage and real-time detection, without depending on external services.
+    - - Improves accuracy by comparing CNN and RNN models with baseline models to reduce false positives and negatives, and uses efficient training methods to lower computational demands and ensure effective updates.
+
+==================================================
+SLIDE 18
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - CONCLUSION
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - This project focused on distinguishing phishing URLs using machine learning and deep learning models, comparing an improved CNN and RNN against Naive Bayes. The enhanced CNN, leveraging convolutional layers, batch normalization, and dropout, outperformed Naive Bayes across Accuracy, Precision, Recall, and F1-Score metrics. This highlights the CNN's effectiveness in detecting phishing threats and its potential to bolster internet security. Future work aims to integrate these models into proactive phishing detection systems and explore enhancements using Natural Language Processing techniques for more robust cybersecurity measures.
+
+==================================================
+SLIDE 19
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Group 3] (type: GROUP (6))
+  Shape 3 [Freeform 6] (type: FREEFORM (5))
+  Shape 4 [Freeform 7] (type: FREEFORM (5))
+  Shape 5 [TextBox 8] (type: TEXT_BOX (17))
+    - REFERENCES
+  Shape 6 [TextBox 9] (type: TEXT_BOX (17))
+    - 1)N. Abdelhamid, A. Ayesh, and F. Thabtah, ‘‘Phishing detection based associative classification data mining,’’ Expert Syst. Appl., vol. 41, no. 13, pp. 5948–5959, Oct. 2014, doi: 10.1016/j.eswa.2014.03.019
+    - 2)M. SatheeshKumar, K. G. Srinivasagan, and G. UnniKrishnan, ‘‘A lightweight and proactive rule-based incremental construction approach to detect phishing scam,’’ Inf. Technol. Manage., vol. 23, no. 4, pp. 271–298, Dec. 2022, doi: 10.1007/s10799- 021-00351-7.
+    - 3)Y. Zhou, Y. Zhang, J. Xiao, Y.Wang, andW. Lin, ‘‘Visual similarity based anti-phishing with the combination of local and global features,’’ in Proc.IEEE 13th Int. Conf. Trust, Secur. Privacy Comput. Commun., Sep. 2014, pp. 189–196, doi: 10.1109/TRUSTCOM.2014.28.
+    - 4)O. K. Sahingoz, E. Buber, O. Demir, and B. Diri, ‘‘Machine learning based phishing detection from URLs,’’ Expert Syst. Appl., vol. 117, pp. 345–357, Mar. 2019, doi: 10.1016/j.eswa.2018.09.029.
+    - 5)Datset:Prasad,Arvind and Chandra,Shalini. (2024). PhiUSIIL Phishing URL (Website). UCI Machine Learning Repository. https://doi.org/10.1016/j.cose.2023.103545.
+
+==================================================
+SLIDE 20
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Freeform 3] (type: FREEFORM (5))
+
+==================================================
+SLIDE 21
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Freeform 3] (type: FREEFORM (5))
+
+==================================================
+SLIDE 22
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Freeform 3] (type: FREEFORM (5))
+
+==================================================
+SLIDE 23
+==================================================
+  Shape 1 [Freeform 2] (type: FREEFORM (5))
+  Shape 2 [Freeform 3] (type: FREEFORM (5))
+  Shape 3 [TextBox 4] (type: TEXT_BOX (17))
+    - THANK YOU
+  Shape 4 [Freeform 5] (type: FREEFORM (5))
+

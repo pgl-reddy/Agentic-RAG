@@ -1,0 +1,369 @@
+PRESENTATION: Adaptive_Agentic_RAG_Final (1).pptx
+Slide Dimensions: 12192000 x 6858000
+
+==================================================
+SLIDE 1
+==================================================
+  Shape 1 [TextBox 3] (type: TEXT_BOX (17))
+    - Department of Computer Science And Engineering
+  Shape 2 [TextBox 5] (type: TEXT_BOX (17))
+    - UNIVERSITY COLLEGE OF ENGINEERING, SCIENCE AND TECHNOLOGY HYDERABAD
+  Shape 3 [TextBox 6] (type: TEXT_BOX (17))
+    - JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY HYDERABAD
+  Shape 4 [TextBox 7] (type: TEXT_BOX (17))
+    - Kukatpally, Hyderabad, Telangana (India) - 500 085.
+  Shape 5 [TextBox 9] (type: TEXT_BOX (17))
+    - MINI PROJECT WITH SEMINAR
+    - ADAPTIVE AGENTIC RAG FOR INTELLIGENTLEGAL QUESTION ANSWERING
+  Shape 6 [TextBox 11] (type: TEXT_BOX (17))
+    - GROUP MEMBERS
+  Shape 7 [TextBox 12] (type: TEXT_BOX (17))
+    - V. Vybhavi (22011P0502)K. Greeshma (22011P0504)P. Gnana Laya Reddy (22011P0507)M. Akash Reddy (22011P0509 )G. Rahul (22011P0549)D. Vaishnavi (22011P0552)
+  Shape 8 [TextBox 13] (type: TEXT_BOX (17))
+    - COURSE / ACADEMIC DETAILS
+  Shape 9 [TextBox 14] (type: TEXT_BOX (17))
+    - Course: B.Tech-IDPYear: 5th YearSemester: I SemesterDepartment: CSE
+  Shape 10 [Picture 17] (type: PICTURE (13))
+  Shape 11 [Rectangle 19] (type: AUTO_SHAPE (1))
+  Shape 12 [Rectangle 21] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 2
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - TABLE OF CONTENTS
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 02
+  Shape 3 [Rectangle 3] (type: AUTO_SHAPE (1))
+  Shape 4 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | S. No. | Section | Page No. |
+      | 1 | Abstract | 3 |
+      | 2 | Introduction | 4 |
+      | 3 | Problem Statement | 5 |
+      | 4 | Existing Work / Base Paper | 6 |
+      | 5 | Research Gap & Justification | 8 |
+      | 6 | Proposed Work | 9 |
+      | 7 | Dataset | 10 |
+      | 8 | Methodology | 11 |
+      | 9 | Proposed Architecture | 12 |
+      | 10 | Evaluation Plan | 13 |
+      | 11 | Expected Outcomes | 14 |
+      | 12 | Conclusion | 15 |
+      | 13 | References | 16 |
+
+==================================================
+SLIDE 3
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - ABSTRACT
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 03
+  Shape 3 [TextBox 4] (type: TEXT_BOX (17))
+    - 3
+  Shape 4 [TextBox 5] (type: TEXT_BOX (17))
+    - Large Language Models can provide fluent answers, but responses may be unreliable, outdated, or unsupported by authoritative evidence. Hence, Grounding is used in AI. Grounding is a practice of connecting an AI model’s output to verifiable, real-world data or trusted external sources. Grounding matters to
+    - Reduce Hallucinations – Stops AI from faking data
+    - Adds traceability – clear citations to original sources
+    - Keeps data current – to answer using up-to-date information
+    - Common grounding techniques involve Retrieval-Augmented Generation (RAG). Existing work Agentic RAG can improve answer quality by evaluating a generated response and repeating retrieval when the response is inadequate.
+    - The proposed system moves control before generation: query analysis, reformulation, retrieval routing, evidence sufficiency assessment.
+    - Retrieval is dynamically selected from sparse, dense, and hybrid modes according to the legal query.
+    - If evidence is insufficient, the query is reformulated and retrieval is repeated; otherwise, a grounded answer with citations is generated.
+    - The project focuses on integration of known techniques into a pre-generation retrieval-control loop for legal question answering.
+  Shape 5 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 4
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - INTRODUCTION
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 04
+  Shape 3 [TextBox 5] (type: TEXT_BOX (17))
+    - Legal answers often depend on legal sections, case names, citations, legal terminology, and recent amendments.
+    - General LLMs may answer from learned parameters without verifying whether current legal evidence supports the response.
+    - Generated Information can be unreliable, outdated, or insufficiently grounded.
+    - RAG improves grounding by retrieving source documents before generation. But a RAG system can still retrieve weak, irrelevant or incomplete evidence.
+    - Thus, an Agentic RAG approach, adds iterative decision-making and quality checking.
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+  Shape 5 [TextBox 11] (type: TEXT_BOX (17))
+    - RESEARCH PROBLEM
+  Shape 6 [TextBox 12] (type: TEXT_BOX (17))
+    - How can we verify that the evidence is sufficient before the LLM generates the final answer?
+    - Does different Retrieval techniques produce different levels of extraction?
+
+==================================================
+SLIDE 5
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - PROBLEM STATEMENT
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 05
+  Shape 3 [TextBox 6] (type: TEXT_BOX (17))
+    - RAG pipelines can retrieve weak or incomplete evidence and still proceed to answer generation.
+    - A single retrieval strategy is not equally effective for exact legal references and semantically phrased legal questions.
+    - The knowledge base cannot be a static corpus because of the dynamic nature of amendments, notices and cannot be web-knowledge as retrieval is costly.
+    - Post-generation quality checking wastes a generation step before discovering that the supporting evidence is inadequate.
+    - Unsupported legal answers are especially risky because users may treat them as authoritative.
+  Shape 4 [TextBox 8] (type: TEXT_BOX (17))
+    - Can a pre-generation adaptive retrieval-control loop improve legal evidence retrieval and reduce unsupported answers?
+  Shape 5 [Rectangle 10] (type: AUTO_SHAPE (1))
+  Shape 6 [TextBox 12] (type: TEXT_BOX (17))
+    - RESEARCH QUESTION
+  Shape 7 [Rectangle 14] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 6
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - EXISTING WORK / BASE PAPER
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 06
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Aspect | Base Paper – Woo et al. |
+      | Domain | Evidence-based medicine / ACL guidelines |
+      | Evaluation Set | 100 QA pairs from 2022 AAOS ACL guidelines |
+      | RAG | Vector retrieval from embedded guideline text |
+      | Agent | Quality Judge LLM evaluates the RAG response |
+      | Retry | If Unsatisfactory response, then repeat RAG search |
+      | Reported Result | RAG: +39.7% average accuracy; best Agentic RAG: GPT-4 at 95% |
+  Shape 4 [TextBox 6] (type: TEXT_BOX (17))
+    - Base-paper control point: RETRIEVE, GENERATE, JUDGE, RETRY
+  Shape 5 [Rectangle 8] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 7
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - RELATED PAPERS
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 07
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Paper | Relevance to Project |
+      | Lu (2025)- Mutual Information-based RAG for QA | Uses Mutual Information as metric to identify and retrieve relevant information from the Knowledge Graph . |
+      | A RAG Method based on intent analysis and ranking fusion (2025) | Query analysis + Retrieval: Uses intent analysis and ranking fusion, directly supporting query understanding. |
+      | Enhancing RAG through Modular Optimization: Evaluation across the RAG pipeline | Query expansion + Retrieval: Examines modular RAG improvements including query expansion and retrieval optimization, supporting adaptive retrieval. |
+      | Context-Aware Retrieval Augmented Generation Using Similarity Validation to Handle Context Inconsistencies in LLM(2025) | Evidence Assessment + reranking: Uses similarity validation and discussions cross-encoder reranking to improve the relevance and consistency of retrieved evidence before generation. |
+      | Woo et al. (2025) – Custom LLMs / Agentic RAG | Base paper; Quality Judge evaluates generated RAG responses. |
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 8
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - RESEARCH GAP & JUSTIFICATION
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 08
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Observed Gap | Why it matters | Proposed response |
+      | Answer judged after generation | Generation may occur on weak evidence | Assess evidence before generation |
+      | Fixed retrieval flow | Legal queries vary: exact citations vs semantic questions | Adaptive sparse / dense / hybrid routing |
+      | No explicit query-quality stage | Ambiguous queries can cause poor retrieval | Query analysis + reformulation |
+      | Repeated RAG may be inefficient | Retries may repeat the same weak search | Reformulate before retry |
+      | Legal information changes | Static corpus may miss amendments / notifications | Static KB + trusted official live retrieval |
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 9
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - PROPOSED WORK
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 09
+  Shape 3 [TextBox 5] (type: TEXT_BOX (17))
+    - Analyze the legal query for legal terms, entities, case references, citations, and ambiguity.
+    - Reformulate weak or ambiguous queries before retrieval.
+    - Route each query to BM25 sparse retrieval, dense semantic retrieval, or hybrid retrieval.
+    - Re-rank retrieved passages using a cross-encoder relevance model.
+    - Assess evidence sufficiency before allowing the LLM to generate an answer.
+    - Retry with a reformulated query when evidence is insufficient.
+    - Return an explicit insufficient-evidence response when adequate support cannot be obtained within the retry limit.
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 10
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - DATASET / KNOWLEDGE BASE
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 10
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Detail | IndicLegalQA / Project Knowledge Base |
+      | Dataset name | IndicLegalQA Dataset – Version 2 |
+      | Primary domain | Indian legal question answering |
+      | Size | 10,000 QA pairs from 1,256 Supreme Court judgments |
+      | Case split | 538 criminal cases + 718 civil cases |
+      | Format | JSON; fields include question, answer, case name, judgment date |
+      | Repository / source | Mendeley Data; judgments originate from Supreme Court of India corpus |
+      | Dataset file size | ~4.74 – 4.77 MB per JSON file |
+      | Licence | CC BY 4.0 |
+      | Project static KB | Textbooks, landmark judgments, definitions, Constitution, central/state Acts |
+      | Live retrieval | Trusted official websites for amendments, judgments, notifications, circulars |
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 11
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - METHODOLOGY & ALGORITHMS
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 11
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Stage | Algorithm / Technique | Purpose |
+      | Query analysis | Rule-based legal entity / citation extraction | Detect legal terms, sections, case references, ambiguity |
+      | Query reformulation | LLM-based reformulation + threshold rules | Improve weak / ambiguous queries |
+      | Sparse retrieval | BM25 | Exact lexical matching for sections, names, citations |
+      | Dense retrieval | Sentence-Transformer embeddings* | Semantic matching when wording differs |
+      | Hybrid retrieval | BM25 + dense score fusion / RRF* | Combine lexical and semantic evidence |
+      | Re-ranking | Cross-Encoder relevance scoring | Reorder retrieved passages by query relevance |
+      | Evidence check | Score threshold + LLM evidence judgment | Decide whether evidence is sufficient |
+      | Generation | Grounded LLM answer with citations | Generate only from assessed evidence |
+  Shape 4 [TextBox 6] (type: TEXT_BOX (17))
+    - * Planned implementation choice; exact embedding model / fusion threshold will be finalized experimentally.
+  Shape 5 [Rectangle 8] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 12
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - PROPOSED ARCHITECTURE
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 12
+  Shape 3 [Rounded Rectangle 5] (type: AUTO_SHAPE (1))
+    - USER LEGAL QUERY
+  Shape 4 [Rounded Rectangle 6] (type: AUTO_SHAPE (1))
+    - QUERY ANALYSISRules: entities • sections • citations • ambiguity
+  Shape 5 [Connector 7] (type: LINE (9))
+  Shape 6 [Rounded Rectangle 8] (type: AUTO_SHAPE (1))
+    - QUERY REFORMULATIONLLM + threshold rules
+  Shape 7 [Connector 9] (type: LINE (9))
+  Shape 8 [Rounded Rectangle 10] (type: AUTO_SHAPE (1))
+    - INTELLIGENT RETRIEVAL ROUTER
+  Shape 9 [Connector 11] (type: LINE (9))
+  Shape 10 [Rounded Rectangle 12] (type: AUTO_SHAPE (1))
+    - BM25Sparse
+  Shape 11 [Connector 13] (type: LINE (9))
+  Shape 12 [Rounded Rectangle 14] (type: AUTO_SHAPE (1))
+    - DenseEmbeddings
+  Shape 13 [Connector 15] (type: LINE (9))
+  Shape 14 [Rounded Rectangle 16] (type: AUTO_SHAPE (1))
+    - HybridBM25 + Dense / RRF
+  Shape 15 [Connector 17] (type: LINE (9))
+  Shape 16 [Rounded Rectangle 18] (type: AUTO_SHAPE (1))
+    - TOP-k PASSAGES → CROSS-ENCODER RE-RANKING
+  Shape 17 [Connector 19] (type: LINE (9))
+  Shape 18 [Connector 20] (type: LINE (9))
+  Shape 19 [Connector 21] (type: LINE (9))
+  Shape 20 [Rounded Rectangle 22] (type: AUTO_SHAPE (1))
+    - EVIDENCE SUFFICIENCYThreshold + LLM evidence judgment
+  Shape 21 [Connector 23] (type: LINE (9))
+  Shape 22 [Rounded Rectangle 24] (type: AUTO_SHAPE (1))
+    - ENOUGH → GENERATE CITED ANSWER
+  Shape 23 [Rounded Rectangle 25] (type: AUTO_SHAPE (1))
+    - INSUFFICIENT → REFORMULATE & RETRY
+  Shape 24 [Connector 26] (type: LINE (9))
+  Shape 25 [Connector 27] (type: LINE (9))
+  Shape 26 [Rectangle 29] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 13
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - EVALUATION PLAN
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 13
+  Shape 3 [Table 5] (type: TABLE (19))
+    [TABLE]
+      | Category | Metric | What it measures |
+      | Retrieval | Recall@k | Whether relevant legal evidence appears in top-k |
+      | Retrieval | Precision@k | How much of retrieved top-k is relevant |
+      | Retrieval | MRR | Rank of the first relevant passage |
+      | Answer quality | Faithfulness | Whether the answer is supported by retrieved evidence |
+      | Answer quality | Relevance | How directly the answer addresses the legal question |
+      | Efficiency | Latency | End-to-end response time |
+      | Adaptivity | Retrieval Attempts | Number of retrieval / reformulation cycles |
+  Shape 4 [TextBox 6] (type: TEXT_BOX (17))
+    - Comparison: BM25 vs Dense vs Hybrid vs Adaptive Agentic RAG
+  Shape 5 [Rectangle 8] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 14
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - EXPECTED OUTCOMES
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 14
+  Shape 3 [TextBox 5] (type: TEXT_BOX (17))
+    - System should select retrieval strategies according to the structure of the legal query.
+    - Improve evidence retrieval for weak or ambiguous questions through reformulation.
+    - Reduce generation based on incomplete or irrelevant legal evidence.
+    - Produce grounded legal answers with source citations.
+    - Return an insufficient-evidence response instead of an unsupported answer.
+    - Measure the trade-off between retrieval quality, faithfulness, latency, and number of retries.
+  Shape 4 [Rectangle 7] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 15
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - CONCLUSION
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 15
+  Shape 3 [TextBox 5] (type: TEXT_BOX (17))
+    - The project extends the base Agentic RAG idea from post-generation answer checking to pre-generation retrieval control.
+    - The proposed pipeline combines query analysis, reformulation, adaptive routing, re-ranking, and evidence sufficiency assessment.
+    - BM25, dense semantic retrieval, and hybrid retrieval address different legal query characteristics.
+    - Generation is evidence-gated: answer only when sufficient support is available.
+    - IndicLegalQA provides a structured benchmark for evaluating retrieval and grounded legal question answering.
+  Shape 4 [TextBox 7] (type: TEXT_BOX (17))
+    - Adaptive evidence verification BEFORE answer generation
+  Shape 5 [Rectangle 9] (type: AUTO_SHAPE (1))
+  Shape 6 [TextBox 11] (type: TEXT_BOX (17))
+    - CORE CONTRIBUTION
+  Shape 7 [Rectangle 13] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 16
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - REFERENCES
+  Shape 2 [TextBox 2] (type: TEXT_BOX (17))
+    - 16
+  Shape 3 [TextBox 5] (type: TEXT_BOX (17))
+    - 1. Woo, J. J. et al., “Custom Large Language Models Improve Accuracy: Comparing RAG and AI Agents to Noncustom Models for Evidence-Based Medicine,” Arthroscopy, 2025.
+  Shape 4 [TextBox 6] (type: TEXT_BOX (17))
+    - 2. L. Kong, G. Wang, N. Liu, T. Bai and J. He, "A Retrieval-Augmented Generation method based on Intent Analysis and Ranking Fusion," 2024 7th International Conference on Data Science and Information Technology (DSIT), Nanjing, China, 2024, pp. 1-8
+  Shape 5 [TextBox 7] (type: TEXT_BOX (17))
+    - 3. E. Mattos et al., "Enhancing Retrieval-Augmented Generation through Modular Optimization: Evaluation Across the RAG Pipeline," 2025 Symposium on Internet of Things (SIoT), Campinas, Brazil, 2025, pp. 1-4
+  Shape 6 [TextBox 8] (type: TEXT_BOX (17))
+    - 4. Collini, Enrico & Kurniadi, Felix & Nesi, Paolo & Pantaleo, Gianni. (2025). Context-Aware Retrieval Augmented Generation Using Similarity Validation to Handle Context Inconsistencies in Large Language Models. IEEE Access. 13. 170065-170080. 10.1109/ACCESS.2025.3614553.
+  Shape 7 [TextBox 9] (type: TEXT_BOX (17))
+    - 5. Linders, J., Tomczak, J.M. Knowledge graph-extended retrieval augmented generation for question answering. Appl Intell 55, 1102 (2025).
+  Shape 8 [TextBox 10] (type: TEXT_BOX (17))
+    - 6. Pradeesh N, Remya T, MG Thushara, K Arun Krishna, Pranav V,Retrieval-Augmented Generation for Multiple-Choice Questions and Answers Generation,
+    - Procedia Computer Science,Volume 259,2025,Pages 504-511,ISSN 1877-0509.
+  Shape 9 [TextBox 11] (type: TEXT_BOX (17))
+    - 7. Lee, J.H., Ali, G. and Hwang, J.-I. (2025), A Retrieval-Augmented Generation System for Accurate and Contextual Historical Analysis: AI-Agent for the Annals of the Joseon Dynasty. Comput Anim Virtual Worlds, 36: e70048.
+  Shape 10 [TextBox 12] (type: TEXT_BOX (17))
+    - 8. Z. Penghao, Z. Hailin, Y. Qinhan, W. Zhengren, G. Yunteng, F. Fangcheng, Y. Ling, Z. Wentao, J. Jie, and C. Bin, “Retrieval-Augmented Generation for AI-Generated Content: A Survey,” arXiv preprint arXiv:2402.19473, 2024.
+  Shape 11 [TextBox 13] (type: TEXT_BOX (17))
+    - 9. W. Tian and Y. Zhou, “Hi-RAG: A hierarchical retrieval-augmented generation framework for scalable and generalisable tool selection in large language model agents,” arXiv preprint, 2025.
+  Shape 12 [TextBox 14] (type: TEXT_BOX (17))
+    - 10. J. Liang, G. Su, H. Lin, Y. Wu, R. Zhao, and Z. Li, “Reasoning RAG via System 1 or System 2: A survey on reasoning agentic retrieval-augmented generation for industry challenges,” arXiv preprint, 2025.
+  Shape 13 [TextBox 15] (type: TEXT_BOX (17))
+    - 11. C. Zhang, Y. Wang, D. Xu, H. Zhang, Y. Lyu, Y. Chen, S. Liu, T. Xu, X. Zhao, Y. Gao, Y. Hu, and E. Chen, “TeaRAG: A Token-Efficient Agentic Retrieval-Augmented Generation Framework,” ACM Transactions on Information Systems, 2026, doi: 10.1145/3818621.
+  Shape 14 [Rectangle 17] (type: AUTO_SHAPE (1))
+
+==================================================
+SLIDE 17
+==================================================
+  Shape 1 [TextBox 1] (type: TEXT_BOX (17))
+    - THANK YOU
+  Shape 2 [Rectangle 2] (type: AUTO_SHAPE (1))
+

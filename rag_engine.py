@@ -96,7 +96,7 @@ LEGAL_TERMS_TAXONOMY = {
     "judicial review", "ultra vires", "doctrine of severability", "pith and substance",
     # Statutory & Offences
     "act", "article", "section", "clause", "schedule", "constitution", "code", "statute",
-    "ipc", "bns", "crpc", "bnss", "bsa", "cpc", "defamation", "theft", "murder",
+    "ipc", "bns", "crpc", "bnss", "bsa", "cpc", "it act", "information technology act", "defamation", "theft", "murder",
     "culpable homicide", "dowry", "cruelty", "cheating", "fraud", "corruption", "contempt",
     "tort", "negligence", "breach of contract", "limitation", "precedent", "ruling", "judgment",
     "ratio decidendi", "obiter dicta", "amendment", "rules", "regulations", "ordinance"
@@ -164,16 +164,17 @@ class Evidence:
 
 
 def _tokens(text: str) -> list[str]:
-    return re.findall(r"[a-zA-Z0-9]+", text.lower())
+    return re.findall(r"[\w]+", text.lower(), re.UNICODE)
 
 
 def load_corpus() -> list[dict[str, Any]]:
     """Read the bundled sample and locally ingested source records."""
+    data_dir = Path(__file__).resolve().parent / "data"
     rows: list[dict[str, Any]] = []
     for path in (
-        Path("data/demo_legal_corpus.jsonl"),
-        Path("data/legal_corpus.jsonl"),
-        Path("data/pdf_legal_corpus.jsonl"),
+        data_dir / "demo_legal_corpus.jsonl",
+        data_dir / "legal_corpus.jsonl",
+        data_dir / "pdf_legal_corpus.jsonl",
     ):
         if path.exists():
             for line in path.read_text(encoding="utf-8").splitlines():
@@ -225,14 +226,18 @@ def analyze_legal_query(question: str) -> QueryAnalysis:
     # 4. Citations detection (Articles, Sections, Law Reports)
     found_citations: set[str] = set()
     # Articles
-    for art in re.findall(r"\bArticle\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))?\b", cleaned, re.IGNORECASE):
-        found_citations.add(art.title())
+    for art in re.findall(r"\b(?:Article|Art\.?)\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))?\b", cleaned, re.IGNORECASE):
+        norm = re.sub(r"(?i)\bart\.?\s*", "Article ", art)
+        found_citations.add(norm.title())
     # Sections
-    for sec in re.findall(r"\bSection\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*\b", cleaned, re.IGNORECASE):
-        found_citations.add(sec.title())
+    for sec in re.findall(r"\b(?:Section|Sec\.?)\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*\b", cleaned, re.IGNORECASE):
+        norm = re.sub(r"(?i)\bsec\.?\s*", "Section ", sec)
+        found_citations.add(norm.title())
     # Orders & Rules
     for ord_rule in re.findall(r"\bOrder\s+[IVXLCDM0-9]+\s+Rule\s+\d+\b", cleaned, re.IGNORECASE):
         found_citations.add(ord_rule.title())
+    for rule in re.findall(r"\bRule\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*\b", cleaned, re.IGNORECASE):
+        found_citations.add(rule.title())
     # Law report reporter patterns: AIR 1978 SC 597, (1973) 4 SCC 225, etc.
     for rep in re.findall(r"\b(?:AIR\s+\d{4}\s+[A-Za-z]+(?:\s+\d+)?|\d{4}\s+(?:\(\d+\)\s+)?(?:SCC|SCR|SCALE|CrLJ|ILR)(?:\s+\d+)?)\b", cleaned, re.IGNORECASE):
         found_citations.add(rep)
@@ -297,12 +302,25 @@ def quality_check(question: str) -> tuple[bool, str]:
 # ──────────────────────────────────────────────────────────────────────────────
 # STAGE 2: Query Reformulation
 # ──────────────────────────────────────────────────────────────────────────────
-def groq_chat(messages: list[dict[str, str]], temperature: float = 0.1) -> str:
+_GROQ_CLIENT = None
+_GROQ_CLIENT_KEY = None
+
+
+def get_groq_client():
+    global _GROQ_CLIENT, _GROQ_CLIENT_KEY
     from groq import Groq
     key = os.getenv("GROQ_API_KEY")
     if not key:
         raise RuntimeError("GROQ_API_KEY is not configured")
-    response = Groq(api_key=key).chat.completions.create(
+    if _GROQ_CLIENT is None or _GROQ_CLIENT_KEY != key:
+        _GROQ_CLIENT = Groq(api_key=key)
+        _GROQ_CLIENT_KEY = key
+    return _GROQ_CLIENT
+
+
+def groq_chat(messages: list[dict[str, str]], temperature: float = 0.1) -> str:
+    client = get_groq_client()
+    response = client.chat.completions.create(
         model=os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
         messages=messages,
         temperature=temperature,
@@ -311,8 +329,58 @@ def groq_chat(messages: list[dict[str, str]], temperature: float = 0.1) -> str:
     return response.choices[0].message.content or ""
 
 
+LEGAL_ABBREVIATION_EXPANSIONS = [
+    # Specific IT Act / Rules
+    (r"\b(?:rule|sec(?:tion)?)\s*(\d+[A-Za-z]?)\s*(?:of\s+)?it\s+act\b", r"Information Technology Rules, 2021 Rule \1 / Information Technology Act, 2000 Section \1"),
+    (r"\bit\s+act\b(?!\s*,\s*2000)", "Information Technology Act, 2000"),
+
+    # Articles of Constitution (only if not already followed by Constitution of India)
+    (r"\b(?:art|article)\s*(\d+[A-Za-z]?)\b(?!\s+(?:of\s+)?(?:the\s+)?constitution)", r"Article \1 Constitution of India"),
+
+    # Criminal provisions (only if not already followed by full Act name)
+    (r"\bsec(?:tion)?\s*438\s*(?:crpc)?\b(?!\s+(?:of\s+)?(?:the\s+)?code\s+of\s+criminal)", "Section 438 Code of Criminal Procedure, 1973 (anticipatory bail)"),
+    (r"\bsec(?:tion)?\s*439\s*(?:crpc)?\b(?!\s+(?:of\s+)?(?:the\s+)?code\s+of\s+criminal)", "Section 439 Code of Criminal Procedure, 1973 (bail powers)"),
+    (r"\bsec(?:tion)?\s*482\s*(?:crpc)?\b(?!\s+(?:of\s+)?(?:the\s+)?code\s+of\s+criminal)", "Section 482 Code of Criminal Procedure, 1973 (inherent powers)"),
+    (r"\bsec(?:tion)?\s*302\s*(?:ipc)?\b(?!\s+(?:of\s+)?(?:the\s+)?indian\s+penal)", "Section 302 Indian Penal Code, 1860 / Section 103 Bharatiya Nyaya Sanhita, 2023"),
+    (r"\bsec(?:tion)?\s*498a\s*(?:ipc)?\b(?!\s+(?:of\s+)?(?:the\s+)?indian\s+penal)", "Section 498A Indian Penal Code, 1860 (cruelty dowry harassment)"),
+
+    # Common colloquial legal queries
+    (r"\bget out of jail\b", "provisions for grant of bail and release on personal bond"),
+    (r"\bpolice arrest without warrant\b", "Section 41 Code of Criminal Procedure / Section 35 Bharatiya Nagarik Suraksha Sanhita when police may arrest without warrant"),
+]
+
+
 def reformulate_query(question: str, analysis: QueryAnalysis) -> tuple[str, bool, str]:
     """Stage 2: Reformulate weak or ambiguous queries before retrieval."""
+    t_lower = question.lower()
+    full_statutes = [
+        "constitution of india",
+        "indian penal code",
+        "code of criminal procedure",
+        "bharatiya nyaya sanhita",
+        "bharatiya nagarik suraksha sanhita",
+        "bharatiya sakshya adhiniyam",
+        "indian evidence act",
+        "information technology act, 2000",
+        "information technology rules, 2021",
+    ]
+    # If already fully qualified with statute and not using shorthand like 'art ', 'sec ', 'crpc', 'ipc'
+    if any(s in t_lower for s in full_statutes) and not re.search(r"\b(?:art|sec|crpc|ipc|bns|bnss|bsa|it\s+act)\b", t_lower):
+        return question, False, "Query already contains explicit legal anchors; proceeded without reformulation."
+
+    # 1. Expand recognized legal shorthand / abbreviations into authoritative enactments
+    abbrev_expanded = question
+    matched_abbrev = False
+    for pattern, replacement in LEGAL_ABBREVIATION_EXPANSIONS:
+        if re.search(pattern, abbrev_expanded, flags=re.IGNORECASE):
+            abbrev_expanded = re.sub(pattern, replacement, abbrev_expanded, count=1, flags=re.IGNORECASE)
+            matched_abbrev = True
+            break
+
+    if matched_abbrev and abbrev_expanded.strip().lower() != question.strip().lower():
+        reason = "Expanded statutory shorthand/abbreviations into formal Indian enactments."
+        return abbrev_expanded.strip(), True, reason
+
     if not analysis.is_ambiguous and not analysis.is_weak:
         return question, False, "Query already contains explicit legal anchors; proceeded without reformulation."
 
@@ -342,39 +410,8 @@ def reformulate_query(question: str, analysis: QueryAnalysis) -> tuple[str, bool
         except Exception:
             pass
 
-    # Deterministic / offline legal reformulation rule engine
-    lowered = question.lower().strip()
-    reformulated = question
-
-    # Common Indian legal abbreviation expansions
-    expansions = [
-        (r"\bart(?:icle)?\s*13\b", "Article 13 of the Constitution of India (laws inconsistent with or in derogation of fundamental rights)"),
-        (r"\bart(?:icle)?\s*12\b", "Article 12 of the Constitution of India (definition of the State)"),
-        (r"\bart(?:icle)?\s*14\b", "Article 14 of the Constitution of India (equality before law and equal protection of laws)"),
-        (r"\bart(?:icle)?\s*21\b", "Article 21 of the Constitution of India (protection of life and personal liberty)"),
-        (r"\bart(?:icle)?\s*19\b", "Article 19 of the Constitution of India (fundamental freedoms and reasonable restrictions)"),
-        (r"\bart(?:icle)?\s*32\b", "Article 32 of the Constitution of India (writ jurisdiction Supreme Court)"),
-        (r"\bart(?:icle)?\s*226\b", "Article 226 of the Constitution of India (High Court writ jurisdiction)"),
-        (r"\bart(?:icle)?\s*(\d+[A-Za-z]?)\b", r"Article \1 of the Constitution of India"),
-        (r"\bsec(?:tion)?\s*438\s*(?:crpc)?\b", "Section 438 Code of Criminal Procedure, 1973 (direction for grant of bail to person apprehending arrest - anticipatory bail)"),
-        (r"\bsec(?:tion)?\s*439\s*(?:crpc)?\b", "Section 439 Code of Criminal Procedure, 1973 (special powers of High Court or Court of Session regarding bail)"),
-        (r"\bsec(?:tion)?\s*482\s*(?:crpc)?\b", "Section 482 Code of Criminal Procedure, 1973 (inherent powers of High Court to prevent abuse of process or secure ends of justice)"),
-        (r"\bsec(?:tion)?\s*302\s*(?:ipc)?\b", "Section 302 Indian Penal Code, 1860 (punishment for murder) / Section 103 Bharatiya Nyaya Sanhita, 2023"),
-        (r"\bsec(?:tion)?\s*498a\s*(?:ipc)?\b", "Section 498A Indian Penal Code, 1860 (husband or relative of husband of a woman subjecting her to cruelty and dowry harassment)"),
-        (r"\bget out of jail\b", "provisions for grant of bail and release on personal bond"),
-        (r"\bpolice arrest without warrant\b", "Section 41 Code of Criminal Procedure / Section 35 Bharatiya Nagarik Suraksha Sanhita when police may arrest without warrant"),
-    ]
-
-    matched = False
-    for pattern, replacement in expansions:
-        if re.search(pattern, lowered):
-            reformulated = re.sub(pattern, replacement, reformulated, flags=re.IGNORECASE)
-            matched = True
-            break
-
-    if not matched:
-        reformulated = f"Indian law statutory provisions and judicial precedents regarding: {question}"
-
+    # Deterministic fallback
+    reformulated = f"Indian law statutory provisions and judicial precedents regarding: {question}"
     reason = f"Rule-based legal reformulation applied to resolve: {'; '.join(analysis.ambiguity_reasons)}"
     return reformulated, True, reason
 
@@ -572,9 +609,10 @@ class LegalRetriever:
 
         # Robust fallback if cross-encoder model cannot be invoked
         for item in candidates:
-            item.cross_encoder_prob = float(item.relevance)
+            combined_prob = max(float(item.relevance), min(1.0, float(item.score) if item.score < 1.0 else float(item.score) / 10.0))
+            item.cross_encoder_prob = float(combined_prob)
             item.cross_encoder_score = float(item.score)
-        return sorted(candidates, key=lambda x: (x.relevance, x.score), reverse=True)
+        return sorted(candidates, key=lambda x: (x.cross_encoder_prob, x.score), reverse=True)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -612,7 +650,7 @@ def assess_evidence_sufficiency(
         citation_found = False
         for cit in analysis.citations:
             cit_core = re.sub(r"[^a-zA-Z0-9]", "", cit).lower()
-            for ev in evidence[:3]:
+            for ev in evidence[:8]:
                 if cit_core in re.sub(r"[^a-zA-Z0-9]", "", ev.title + " " + ev.text).lower():
                     citation_found = True
                     break
@@ -806,7 +844,8 @@ def run_agent(
     retrieval_query, was_reformulated, reformulate_reason = reformulate_query(question, analysis)
 
     # ── STAGE 3: Route query to BM25, Dense, or Hybrid ──
-    route, route_reason = choose_route(retrieval_query, analysis)
+    route_analysis = analyze_legal_query(retrieval_query) if was_reformulated else analysis
+    route, route_reason = choose_route(retrieval_query, route_analysis)
 
     # ── STAGE 4: Retrieve and Cross-Encoder Re-rank ──
     def _safe_retrieve(q: str, r: str, lim: int) -> list[Evidence]:
@@ -866,7 +905,10 @@ def run_agent(
         retry_route = "Hybrid Retrieval"
         retry_candidates = _safe_retrieve(retry_query, retry_route, 20)
         if effective_allowed:
-            retry_candidates = [item for item in retry_candidates if item.source in effective_allowed]
+            retry_candidates = [
+                item for item in retry_candidates
+                if item.source in effective_allowed or (item.url and item.url.startswith("local-pdf://"))
+            ]
 
         retry_enough, retry_reason, retry_metrics = assess_evidence_sufficiency(retry_candidates, analysis)
 

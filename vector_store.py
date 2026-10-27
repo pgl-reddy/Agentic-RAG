@@ -18,7 +18,13 @@ never re-embeds or reloads anything that was already indexed.
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 from typing import Any
+
+# Ensure local .venv site-packages are accessible even if run with global python
+_venv_site = Path(__file__).resolve().parent / ".venv" / "Lib" / "site-packages"
+if _venv_site.exists() and str(_venv_site) not in sys.path:
+    sys.path.insert(0, str(_venv_site))
 
 import numpy as np
 
@@ -26,7 +32,7 @@ from embedding import embed_texts, get_embedding_dim
 from faiss_store import FaissStore
 from metadata_store import MetadataStore
 
-DATA_DIR = Path("data")
+DATA_DIR = Path(__file__).resolve().parent / "data"
 FAISS_INDEX_PATH = DATA_DIR / "faiss.index"
 METADATA_PATH = DATA_DIR / "metadata.pkl"
 
@@ -96,8 +102,8 @@ class VectorStore:
             try:
                 import json
                 initial_records = []
-                for p in ("data/demo_legal_corpus.jsonl", "data/legal_corpus.jsonl", "data/pdf_legal_corpus.jsonl"):
-                    f = Path(p)
+                for filename in ("demo_legal_corpus.jsonl", "legal_corpus.jsonl", "pdf_legal_corpus.jsonl"):
+                    f = DATA_DIR / filename
                     if f.exists():
                         for line in f.read_text(encoding="utf-8").splitlines():
                             if line.strip():

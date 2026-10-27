@@ -2,7 +2,7 @@
   "7881536e07458e616f6c91b841814cc95b7084edc7ded8a0897a4beaec701351": {
     "filename": "ITA.pdf",
     "chunk_count": 19,
-    "structure_kind": "constitution",
+    "structure_kind": "act",
     "source": "India Code",
     "ingested_at": "2026-10-18T08:55:47.151588+00:00"
   },
@@ -12,5 +12,12 @@
     "structure_kind": "act",
     "source": "Uploaded PDF",
     "ingested_at": "2026-10-18T09:11:12.834695+00:00"
+  },
+  "1996fd5f392960a687e07b824012e322c723d2f3eb57e2290f1a9263b9815fdc": {
+    "filename": "sample_constitution.pdf",
+    "chunk_count": 15,
+    "structure_kind": "constitution",
+    "source": "India Code",
+    "ingested_at": "2026-08-18T06:37:22.058379+00:00"
   }
 }

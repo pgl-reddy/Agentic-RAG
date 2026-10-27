@@ -2049,7 +2049,8 @@ elif selected_page == "Research workspace":
         )
 
     if investigate:
-        active_sources = st.session_state.get("selected_sources") or source_options
+        selected_raw = st.session_state.get("selected_sources")
+        active_sources = source_options if selected_raw is None else selected_raw
         active_live_web = st.session_state.get("use_live_web", True)
         if not question.strip():
             st.warning("Please enter a legal research question first.")
@@ -2130,9 +2131,14 @@ elif selected_page == "Research workspace":
                 badge_color = '#065f46' if was_reformulated else '#0369a1'
                 badge_text = '✓ Reformulated for Precision' if was_reformulated else '✓ Specific Query Retained'
 
-                retry_badge_html = f'<div style="margin-top:6px; padding-top:6px; border-top:1px dashed #cbd5e1;"><span style="font-weight:700; color:#b45309; font-size:0.75rem; text-transform:uppercase;">Stage 6 Retry Query: </span><code style="background:#fffbeb; color:#b45309; padding:2px 6px; border-radius:3px; font-weight:600; border:1px solid #fde68a;">{retry_query}</code></div>' if retried and retry_query else ''
+                safe_question = html_escape(research_question)
+                safe_query_used = html_escape(query_used)
+                safe_retry_query = html_escape(retry_query) if retry_query else ''
+                safe_reason = html_escape(reformulate_reason) if reformulate_reason else ''
 
-                rationale_html = f'<div style="margin-top:4px; font-size:0.75rem; color:#475569;"><em>Rationale:</em> {reformulate_reason}</div>' if reformulate_reason and was_reformulated else ''
+                retry_badge_html = f'<div style="margin-top:6px; padding-top:6px; border-top:1px dashed #cbd5e1;"><span style="font-weight:700; color:#b45309; font-size:0.75rem; text-transform:uppercase;">Stage 6 Retry Query: </span><code style="background:#fffbeb; color:#b45309; padding:2px 6px; border-radius:3px; font-weight:600; border:1px solid #fde68a;">{safe_retry_query}</code></div>' if retried and retry_query else ''
+
+                rationale_html = f'<div style="margin-top:4px; font-size:0.75rem; color:#475569;"><em>Rationale:</em> {safe_reason}</div>' if reformulate_reason and was_reformulated else ''
 
                 header_html = f"""<div style="background:#ffffff; border:1px solid #c5c6ce; border-radius:6px; padding:1.5rem 1.75rem 1.25rem; margin-bottom:1.25rem;">
 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
@@ -2141,7 +2147,7 @@ elif selected_page == "Research workspace":
 Core Authority &amp; Synthesis (7-Stage Pipeline Output)
 </span>
 <h4 style="font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:600; color:#1a1c1b; margin:0.3rem 0 0;">
-{research_question}
+{safe_question}
 </h4>
 </div>
 <span class="material-symbols-outlined" style="color:#735a3a; font-size:22px;">verified</span>
@@ -2153,8 +2159,8 @@ Core Authority &amp; Synthesis (7-Stage Pipeline Output)
 <span style="font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:700; background:{badge_bg}; color:{badge_color}; padding:2px 8px; border-radius:3px;">{badge_text}</span>
 </div>
 <div style="font-family:'Inter',sans-serif; font-size:0.85rem; line-height:1.5; color:#1a1c1b;">
-<div style="margin-bottom:0.35rem;"><span style="font-weight:600; color:#64748b; font-size:0.75rem; text-transform:uppercase;">Original Inquiry: </span><span style="color:#334155; font-style:italic;">"{research_question}"</span></div>
-<div><span style="font-weight:700; color:#0c1b33; font-size:0.75rem; text-transform:uppercase;">Reformulated Search Query: </span><code style="background:#ffffff; border:1px solid #cbd5e1; color:#0c1b33; font-weight:600; font-size:0.83rem; padding:2px 8px; border-radius:3px;">{query_used}</code></div>
+<div style="margin-bottom:0.35rem;"><span style="font-weight:600; color:#64748b; font-size:0.75rem; text-transform:uppercase;">Original Inquiry: </span><span style="color:#334155; font-style:italic;">"{safe_question}"</span></div>
+<div><span style="font-weight:700; color:#0c1b33; font-size:0.75rem; text-transform:uppercase;">Reformulated Search Query: </span><code style="background:#ffffff; border:1px solid #cbd5e1; color:#0c1b33; font-weight:600; font-size:0.83rem; padding:2px 8px; border-radius:3px;">{safe_query_used}</code></div>
 {rationale_html}
 {retry_badge_html}
 </div>
@@ -2538,6 +2544,7 @@ elif selected_page == "Source Library":
                             source_url.strip(), display_title.strip() or None
                         )
                     reset_retriever()
+                    reset_vector_store_cache()
                     if count:
                         st.success(
                             f"Added {count} chunks from: {title}. "
@@ -2746,11 +2753,11 @@ elif selected_page == "Knowledge Base":
                 # ── Action Navigation: Direct Jump to Research Workspace ────────
                 col_btn1, col_btn2 = st.columns([2, 1], gap="medium")
                 with col_btn1:
-                    if st.button("⚖️ Query this Document in Research Workspace", type="primary", key=f"nav_to_research_{uploaded_file.name}"):
+                    if st.button("⚖️ Query this Document in Research Workspace", type="primary", key=f"nav_to_research_{uploaded_file.name}_{file_hash}"):
                         st.session_state["main_navigation"] = "Research workspace"
                         st.rerun()
                 with col_btn2:
-                    if st.button("🔄 Refresh Local Corpus View", key=f"refresh_view_{uploaded_file.name}"):
+                    if st.button("🔄 Refresh Local Corpus View", key=f"refresh_view_{uploaded_file.name}_{file_hash}"):
                         st.rerun()
 
             except Exception as exc:
@@ -2765,7 +2772,7 @@ elif selected_page == "Knowledge Base":
 
     from pathlib import Path
     import json
-    pdf_corpus_file = Path("data/pdf_legal_corpus.jsonl")
+    pdf_corpus_file = Path(__file__).resolve().parent / "data" / "pdf_legal_corpus.jsonl"
     if pdf_corpus_file.exists():
         pdf_docs = {}
         for line in pdf_corpus_file.read_text(encoding="utf-8").splitlines():

@@ -21,8 +21,9 @@ from pdf_parser import ParsedPDF, PDFIngestionError, parse_pdf
 from chunker import StructuralChunk, chunk_document
 from metadata import DocumentProfile, build_pseudo_url, classify_document, extract_keywords, make_chunk_id, now_iso
 
-CORPUS_PATH = Path("data/pdf_legal_corpus.jsonl")
-MANIFEST_PATH = Path("data/pdf_manifest.json")
+_DATA_DIR = Path(__file__).resolve().parent / "data"
+CORPUS_PATH = _DATA_DIR / "pdf_legal_corpus.jsonl"
+MANIFEST_PATH = _DATA_DIR / "pdf_manifest.json"
 
 
 class DuplicatePDFError(PDFIngestionError):
@@ -159,9 +160,12 @@ def ingest_pdf(
     existing_ids = _existing_chunk_ids()
     records: list[dict[str, Any]] = []
     skipped = 0
-    # Rough page hint: distribute chunk order across the pages actually used.
     for order, chunk in enumerate(chunks):
-        page_hint = parsed.page_numbers[min(order, len(parsed.page_numbers) - 1)] if parsed.page_numbers else None
+        if parsed.page_numbers:
+            page_idx = min(int((order / max(1, len(chunks))) * len(parsed.page_numbers)), len(parsed.page_numbers) - 1)
+            page_hint = parsed.page_numbers[page_idx]
+        else:
+            page_hint = None
         record = _chunk_to_record(chunk, order, filename, profile, structure_kind, page_hint)
         if record["id"] in existing_ids:
             skipped += 1

@@ -4,7 +4,7 @@ Retrieves real-time judgments, citations, benches, and statutory excerpts.
 
 from __future__ import annotations
 
-import functools
+import concurrent.futures
 import re
 from typing import Any
 import requests
@@ -21,6 +21,8 @@ DEFAULT_HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
+_SEARCH_CACHE: dict[tuple[str, int], list[dict[str, Any]]] = {}
+
 
 def sanitize_search_query(query: str) -> str:
     """Prepare legal query for Indian Kanoon formInput."""
@@ -30,7 +32,42 @@ def sanitize_search_query(query: str) -> str:
     return cleaned
 
 
-@functools.lru_cache(maxsize=64)
+def _fetch_single_doc(item: dict[str, Any], query_tokens: set[str]) -> dict[str, Any]:
+    doc_id = item.get("doc_id")
+    if not doc_id:
+        return item
+    clean_doc_url = f"https://indiankanoon.org/doc/{doc_id}/"
+    try:
+        doc_resp = requests.get(clean_doc_url, headers=DEFAULT_HEADERS, timeout=(1.8, 3.0))
+        if doc_resp.status_code == 200:
+            extracted = trafilatura.extract(doc_resp.text, include_comments=False)
+            if extracted:
+                lines = [l.strip() for l in extracted.split("\n") if len(l.strip()) > 70]
+                substantive = [
+                    l for l in lines
+                    if not l.startswith("Case :") and not l.startswith("Applicant")
+                    and not l.startswith("Counsel") and not l.startswith("Advocate")
+                    and not l.startswith("HIGH COURT")
+                ]
+                best_paras = []
+                for p in substantive:
+                    p_tokens = set(re.findall(r"[a-zA-Z0-9]+", p.lower()))
+                    overlap = len(query_tokens & p_tokens)
+                    if overlap > 0:
+                        best_paras.append((overlap, p))
+
+                if best_paras:
+                    best_paras.sort(key=lambda x: x[0], reverse=True)
+                    top_texts = [p for _, p in best_paras[:3]]
+                    doc_text = f"{item['title']}\n\n" + "\n\n".join(top_texts)
+                    item["text"] = doc_text[:1500]
+                else:
+                    item["text"] = extracted[:1400].replace("\n\n", "\n").strip()
+    except Exception:
+        pass
+    return item
+
+
 def search_indian_kanoon(query: str, max_results: int = 4) -> list[dict[str, Any]]:
     """Search Indian Kanoon live for judgments and statutory provisions.
     
@@ -45,6 +82,10 @@ def search_indian_kanoon(query: str, max_results: int = 4) -> list[dict[str, Any
     if not cleaned_query:
         return []
 
+    cache_key = (cleaned_query.lower(), max_results)
+    if cache_key in _SEARCH_CACHE:
+        return _SEARCH_CACHE[cache_key]
+
     encoded = requests.utils.quote(cleaned_query)
     search_url = f"https://indiankanoon.org/search/?formInput={encoded}"
     
@@ -58,6 +99,7 @@ def search_indian_kanoon(query: str, max_results: int = 4) -> list[dict[str, Any
         soup = BeautifulSoup(resp.text, "html.parser")
         result_divs = soup.select(".result")
 
+        prelim_results: list[dict[str, Any]] = []
         for div in result_divs[:max_results]:
             title_el = div.select_one(".result_title a")
             headline_el = div.select_one(".headline")
@@ -67,59 +109,39 @@ def search_indian_kanoon(query: str, max_results: int = 4) -> list[dict[str, Any
             title = title_el.text.strip()
             href = title_el.get("href", "")
             full_url = f"https://indiankanoon.org{href}" if href.startswith("/") else href
-
             snippet = headline_el.text.strip() if headline_el else ""
 
-            # Extract doc ID and attempt to fetch the clean judgment header & holding
-            doc_text = snippet
+            # Robust doc_id extraction handling relative and absolute links
             doc_id = ""
-            if "/doc/" in full_url or "/docfragment/" in full_url:
-                parts = href.split("/")
-                if len(parts) > 2 and parts[2].isdigit():
-                    doc_id = parts[2]
-                    clean_doc_url = f"https://indiankanoon.org/doc/{doc_id}/"
-                    try:
-                        doc_resp = requests.get(clean_doc_url, headers=DEFAULT_HEADERS, timeout=(2.0, 4.0))
-                        if doc_resp.status_code == 200:
-                            extracted = trafilatura.extract(doc_resp.text, include_comments=False)
-                            if extracted:
-                                lines = [l.strip() for l in extracted.split("\n") if len(l.strip()) > 70]
-                                substantive = [
-                                    l for l in lines
-                                    if not l.startswith("Case :") and not l.startswith("Applicant")
-                                    and not l.startswith("Counsel") and not l.startswith("Advocate")
-                                    and not l.startswith("HIGH COURT")
-                                ]
-                                q_tokens = set(re.findall(r"[a-zA-Z0-9]+", cleaned_query.lower()))
-                                best_paras = []
-                                for p in substantive:
-                                    p_tokens = set(re.findall(r"[a-zA-Z0-9]+", p.lower()))
-                                    overlap = len(q_tokens & p_tokens)
-                                    if overlap > 0:
-                                        best_paras.append((overlap, p))
+            doc_match = re.search(r"/(?:doc|docfragment)/(\d+)", full_url)
+            if doc_match:
+                doc_id = doc_match.group(1)
 
-                                if best_paras:
-                                    best_paras.sort(key=lambda x: x[0], reverse=True)
-                                    top_texts = [p for _, p in best_paras[:3]]
-                                    doc_text = f"{title}\n\n" + "\n\n".join(top_texts)
-                                    doc_text = doc_text[:1500]
-                                else:
-                                    doc_text = extracted[:1400].replace("\n\n", "\n").strip()
-                    except Exception:
-                        pass
+            fallback_text = snippet if snippet else f"Judicial precedent from Indian Kanoon: {title}. Review the full judgment text for specific findings."
 
-            if not doc_text:
-                doc_text = f"Judicial precedent from Indian Kanoon: {title}. Review the full judgment text for specific findings."
-
-            results.append({
+            item = {
                 "title": title,
                 "url": full_url,
                 "source": "Indian Kanoon",
-                "text": doc_text,
+                "text": fallback_text,
                 "doc_id": doc_id,
-            })
+            }
+            prelim_results.append(item)
 
-    except Exception as e:
+        # Concurrently fetch substantive document excerpts
+        q_tokens = set(re.findall(r"[a-zA-Z0-9]+", cleaned_query.lower()))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(max(1, len(prelim_results)), 3)) as executor:
+            list(executor.map(lambda it: _fetch_single_doc(it, q_tokens), prelim_results))
+
+        results = prelim_results
+
+        # Only cache successful non-empty results
+        if results:
+            _SEARCH_CACHE[cache_key] = results
+            if len(_SEARCH_CACHE) > 128:
+                _SEARCH_CACHE.pop(next(iter(_SEARCH_CACHE)))
+
+    except Exception:
         # Graceful failure: return empty list on network or parse error
         return results
 

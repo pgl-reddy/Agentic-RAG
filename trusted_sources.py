@@ -11,7 +11,25 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-TRUSTED_EXACT = {"www.indiacode.nic.in", "indiacode.nic.in", "indiankanoon.org", "www.indiankanoon.org", "www.sci.gov.in", "sci.gov.in", "main.sci.gov.in", }
+TRUSTED_EXACT = {
+    "www.indiacode.nic.in", "indiacode.nic.in",
+    "indiankanoon.org", "www.indiankanoon.org",
+    "www.sci.gov.in", "sci.gov.in", "main.sci.gov.in", "registry.sci.gov.in",
+    "delhihighcourt.nic.in", "www.delhihighcourt.nic.in",
+    "bombayhighcourt.nic.in", "www.bombayhighcourt.nic.in",
+    "calcuttahighcourt.gov.in", "www.calcuttahighcourt.gov.in",
+    "allahabadhighcourt.in", "www.allahabadhighcourt.in",
+    "hcmadras.tn.gov.in", "www.hcmadras.tn.gov.in",
+    "mphc.gov.in", "www.mphc.gov.in",
+    "hckerala.gov.in", "www.hckerala.gov.in",
+    "patnahighcourt.gov.in", "www.patnahighcourt.gov.in",
+    "jharkhandhighcourt.nic.in", "www.jharkhandhighcourt.nic.in",
+    "orissahighcourt.nic.in", "www.orissahighcourt.nic.in",
+    "cghighcourt.gov.in", "www.cghighcourt.gov.in",
+    "highcourtchd.gov.in", "www.highcourtchd.gov.in",
+    "ecourts.gov.in", "www.ecourts.gov.in", "services.ecourts.gov.in",
+    "egazette.gov.in", "egazette.nic.in", "lawcommissionofindia.nic.in",
+}
 
 
 def is_trusted_legal_url(url: str, extra_domains: set[str] | None = None) -> bool:
@@ -21,7 +39,13 @@ def is_trusted_legal_url(url: str, extra_domains: set[str] | None = None) -> boo
         return False
     if host in TRUSTED_EXACT or host in (extra_domains or set()):
         return True
-    return host.endswith(".hc.gov.in") or (host.startswith("highcourt") and host.endswith(".gov.in"))
+    if host.endswith(".hc.gov.in") or host.endswith(".ecourts.gov.in"):
+        return True
+    if (host.endswith(".gov.in") or host.endswith(".nic.in")) and (
+        "highcourt" in host or "hcmadras" in host or host.startswith("hc")
+    ):
+        return True
+    return False
 
 
 def extract_page(url: str) -> tuple[str, str]:
@@ -44,6 +68,9 @@ def chunk_text(text: str, size: int = 900, overlap: int = 180) -> list[str]:
         chunk = " ".join(words[start : start + size])
         if len(chunk) >= 180:
             chunks.append(chunk)
+    # If document has substantial text (>= 40 chars) but is under 180 chars, preserve it as one chunk
+    if not chunks and len(text.strip()) >= 40:
+        chunks.append(text.strip())
     return chunks
 
 
@@ -66,7 +93,7 @@ def ingest_trusted_url(url: str, title_override: str | None = None) -> tuple[int
     records = document_records(url, title_override or title, text)
     if not records:
         raise ValueError("No readable page text was extracted. Use a specific HTML legal document page, not a landing page or PDF.")
-    destination = Path("data/legal_corpus.jsonl")
+    destination = Path(__file__).resolve().parent / "data" / "legal_corpus.jsonl"
     destination.parent.mkdir(exist_ok=True)
     existing_ids = set()
     if destination.exists():
@@ -82,3 +109,4 @@ def ingest_trusted_url(url: str, title_override: str | None = None) -> tuple[int
         except Exception:
             pass
     return len(fresh), title_override or title
+
