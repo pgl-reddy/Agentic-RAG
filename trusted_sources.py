@@ -41,23 +41,79 @@ def is_trusted_legal_url(url: str, extra_domains: set[str] | None = None) -> boo
         return True
     if host.endswith(".hc.gov.in") or host.endswith(".ecourts.gov.in"):
         return True
-    if (host.endswith(".gov.in") or host.endswith(".nic.in")) and (
-        "highcourt" in host or "hcmadras" in host or host.startswith("hc")
-    ):
+    # Allow all official Indian Government ministries, portals, and judiciary websites
+    if host.endswith(".gov.in") or host.endswith(".nic.in") or host.endswith(".judiciary.gov.in"):
         return True
     return False
 
 
 def extract_page(url: str) -> tuple[str, str]:
-    """Fetch one allowed page. Callers must validate the URL first."""
-    response = requests.get(url, timeout=25, headers={"User-Agent": "NyayaRoute/1.0 research prototype"})
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
-    for tag in soup(["script", "style", "nav", "footer", "noscript"]):
-        tag.decompose()
-    title = soup.title.get_text(" ", strip=True) if soup.title else url
-    text = soup.get_text(" ", strip=True)
-    return title, re.sub(r"\s+", " ", text)
+    """Fetch one allowed page (HTML or PDF) with robust headers and content extraction."""
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36 NyayaRoute/1.0"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml,application/pdf;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    # Many Indian government portals use self-signed or incomplete SSL chains; fallback to verify=False
+    try:
+        response = requests.get(url, timeout=25, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.SSLError:
+        response = requests.get(url, timeout=25, headers=headers, verify=False)
+        response.raise_for_status()
+
+    content_type = response.headers.get("Content-Type", "").lower()
+    is_pdf = url.lower().endswith(".pdf") or "application/pdf" in content_type
+
+    if is_pdf:
+        import io
+        import pypdf
+        reader = pypdf.PdfReader(io.BytesIO(response.content))
+        pages_text = []
+        for p in reader.pages:
+            t = p.extract_text()
+            if t:
+                pages_text.append(t)
+        full_text = " ".join(pages_text)
+        full_text = re.sub(r"\s+", " ", full_text).strip()
+
+        # Deduce title from first lines of legal text or filename
+        title = ""
+        for line in full_text[:500].split("."):
+            line_s = line.strip()
+            if re.search(r"\b(ACT|RULES?|ORDER|REGULATION|BILL|CONSTITUTION)\b", line_s, re.I):
+                title = line_s
+                break
+        if not title:
+            filename = urlparse(url).path.split("/")[-1]
+            title = filename.replace(".pdf", "").replace("-", " ").replace("_", " ").title()
+        return title.strip(), full_text
+    else:
+        # Try trafilatura first for clean article/judgment text
+        extracted_text = ""
+        try:
+            import trafilatura
+            extracted_text = trafilatura.extract(response.text, include_comments=False) or ""
+        except Exception:
+            extracted_text = ""
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        title = soup.title.get_text(" ", strip=True) if soup.title else url
+        title = re.sub(r"\s*-\s*India Code.*$", "", title, flags=re.IGNORECASE)
+        title = re.sub(r"\s*-\s*Indian Kanoon.*$", "", title, flags=re.IGNORECASE)
+
+        if extracted_text and len(extracted_text.strip()) >= 120:
+            text = re.sub(r"\s+", " ", extracted_text)
+        else:
+            for tag in soup(["script", "style", "nav", "footer", "noscript", "header"]):
+                tag.decompose()
+            text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
+
+        return title.strip() or url, text
 
 
 def chunk_text(text: str, size: int = 900, overlap: int = 180) -> list[str]:
@@ -68,7 +124,6 @@ def chunk_text(text: str, size: int = 900, overlap: int = 180) -> list[str]:
         chunk = " ".join(words[start : start + size])
         if len(chunk) >= 180:
             chunks.append(chunk)
-    # If document has substantial text (>= 40 chars) but is under 180 chars, preserve it as one chunk
     if not chunks and len(text.strip()) >= 40:
         chunks.append(text.strip())
     return chunks
@@ -76,12 +131,26 @@ def chunk_text(text: str, size: int = 900, overlap: int = 180) -> list[str]:
 
 def document_records(url: str, title: str, text: str) -> list[dict]:
     parsed = urlparse(url)
-    source = "India Code" if "indiacode" in parsed.netloc else "Supreme Court of India" if "sci.gov.in" in parsed.netloc else "Indian Kanoon" if "indiankanoon" in parsed.netloc else parsed.netloc
+    source = (
+        "India Code" if "indiacode" in parsed.netloc
+        else "Supreme Court of India" if "sci.gov.in" in parsed.netloc
+        else "Indian Kanoon" if "indiankanoon" in parsed.netloc
+        else "Government of India" if parsed.netloc.endswith(".gov.in") or parsed.netloc.endswith(".nic.in")
+        else parsed.netloc
+    )
     now = datetime.now(timezone.utc).isoformat()
     records = []
     for index, chunk in enumerate(chunk_text(text)):
         digest = hashlib.sha256(f"{url}:{index}:{chunk}".encode()).hexdigest()[:16]
-        records.append({"id": digest, "title": title, "url": url, "source": source, "text": chunk, "kind": "ingested legal material", "ingested_at": now})
+        records.append({
+            "id": digest,
+            "title": title,
+            "url": url,
+            "source": source,
+            "text": chunk,
+            "kind": "ingested legal material",
+            "ingested_at": now,
+        })
     return records
 
 
@@ -97,7 +166,12 @@ def ingest_trusted_url(url: str, title_override: str | None = None) -> tuple[int
     destination.parent.mkdir(exist_ok=True)
     existing_ids = set()
     if destination.exists():
-        existing_ids = {json.loads(line)["id"] for line in destination.read_text(encoding="utf-8").splitlines() if line.strip()}
+        for line in destination.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                try:
+                    existing_ids.add(json.loads(line)["id"])
+                except Exception:
+                    pass
     fresh = [record for record in records if record["id"] not in existing_ids]
     with destination.open("a", encoding="utf-8") as handle:
         for item in fresh:
@@ -109,4 +183,3 @@ def ingest_trusted_url(url: str, title_override: str | None = None) -> tuple[int
         except Exception:
             pass
     return len(fresh), title_override or title
-

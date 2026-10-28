@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-10-27T17:03:47.929834+00:00",
+  "suite": "indic_qa",
+  "sample_size": 50,
+  "seed": 42,
+  "live_web": false,
+  "corpus_records": 1416,
+  "metrics": {
+    "BM25": {
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.7319999999999999,
+      "mrr": 0.99,
+      "gt_coverage": 0.956141798941799,
+      "answer_f1": 0.14767599855561592,
+      "avg_latency_s": 0.027968978881835936,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Dense (FAISS)": {
+      "recall_at_5": 0.98,
+      "precision_at_5": 0.6480000000000001,
+      "mrr": 0.9416666666666668,
+      "gt_coverage": 0.7854596450437882,
+      "answer_f1": 0.13097566613534428,
+      "avg_latency_s": 0.07838930606842041,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Hybrid (RRF)": {
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.7,
+      "mrr": 0.9223333333333332,
+      "gt_coverage": 0.8035863814124684,
+      "answer_f1": 0.1266944036509189,
+      "avg_latency_s": 0.5050083684921265,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Adaptive Legal RAG": {
+      "recall_at_5": 0.94,
+      "precision_at_5": 0.6680000000000001,
+      "mrr": 0.875,
+      "gt_coverage": 0.5993228401228401,
+      "answer_f1": 0.09955647555625599,
+      "avg_latency_s": 1.5673785305023193,
+      "avg_retrieval_attempts": 1.24
+    }
+  }
+}

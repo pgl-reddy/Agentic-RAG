@@ -175,6 +175,7 @@ def load_corpus() -> list[dict[str, Any]]:
         data_dir / "demo_legal_corpus.jsonl",
         data_dir / "legal_corpus.jsonl",
         data_dir / "pdf_legal_corpus.jsonl",
+        data_dir / "indic_case_law_corpus.jsonl",
     ):
         if path.exists():
             for line in path.read_text(encoding="utf-8").splitlines():
@@ -183,12 +184,25 @@ def load_corpus() -> list[dict[str, Any]]:
     return rows
 
 
-def source_summary(corpus: list[dict[str, Any]]) -> list[dict[str, str | int]]:
+def source_summary(corpus: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, dict[str, Any]] = {}
     for item in corpus:
         key = item["url"]
-        grouped.setdefault(key, {"title": item["title"], "url": key, "source": item["source"], "chunks": 0})
+        if key not in grouped:
+            grouped[key] = {
+                "title": item["title"],
+                "url": key,
+                "source": item["source"],
+                "chunks": 0,
+                "chunk_texts": [],
+                "chunk_ids": [],
+            }
         grouped[key]["chunks"] += 1
+        text = item.get("text", "")
+        if text and len(grouped[key]["chunk_texts"]) < 5:
+            grouped[key]["chunk_texts"].append(text)
+        if item.get("id"):
+            grouped[key]["chunk_ids"].append(item.get("id"))
     return sorted(grouped.values(), key=lambda item: (str(item["source"]), str(item["title"])))
 
 
@@ -226,13 +240,11 @@ def analyze_legal_query(question: str) -> QueryAnalysis:
     # 4. Citations detection (Articles, Sections, Law Reports)
     found_citations: set[str] = set()
     # Articles
-    for art in re.findall(r"\b(?:Article|Art\.?)\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))?\b", cleaned, re.IGNORECASE):
-        norm = re.sub(r"(?i)\bart\.?\s*", "Article ", art)
-        found_citations.add(norm.title())
+    for art in re.findall(r"\b(?:Article|Art\.?)\s+(\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))?)\b", cleaned, re.IGNORECASE):
+        found_citations.add(f"Article {art}")
     # Sections
-    for sec in re.findall(r"\b(?:Section|Sec\.?)\s+\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*\b", cleaned, re.IGNORECASE):
-        norm = re.sub(r"(?i)\bsec\.?\s*", "Section ", sec)
-        found_citations.add(norm.title())
+    for sec in re.findall(r"\b(?:Section|Sec\.?)\s+(\d+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*)\b", cleaned, re.IGNORECASE):
+        found_citations.add(f"Section {sec}")
     # Orders & Rules
     for ord_rule in re.findall(r"\bOrder\s+[IVXLCDM0-9]+\s+Rule\s+\d+\b", cleaned, re.IGNORECASE):
         found_citations.add(ord_rule.title())
@@ -595,7 +607,7 @@ class LegalRetriever:
         encoder = self._get_cross_encoder()
         if encoder is not None:
             try:
-                pairs = [(query, item.text[:512]) for item in candidates]
+                pairs = [(query, f"{item.title}: {item.text}"[:512]) for item in candidates]
                 raw_scores = encoder.predict(pairs)
                 for item, raw_score in zip(candidates, raw_scores):
                     val = float(raw_score)
@@ -613,6 +625,23 @@ class LegalRetriever:
             item.cross_encoder_prob = float(combined_prob)
             item.cross_encoder_score = float(item.score)
         return sorted(candidates, key=lambda x: (x.cross_encoder_prob, x.score), reverse=True)
+
+_GLOBAL_RETRIEVER: LegalRetriever | None = None
+
+
+def get_retriever() -> LegalRetriever:
+    """Process-wide cached retriever instance."""
+    global _GLOBAL_RETRIEVER
+    if _GLOBAL_RETRIEVER is None:
+        _GLOBAL_RETRIEVER = LegalRetriever(load_corpus())
+    return _GLOBAL_RETRIEVER
+
+
+def reset_retriever() -> None:
+    """Clear cached retriever so newly ingested documents are immediately visible."""
+    global _GLOBAL_RETRIEVER
+    _GLOBAL_RETRIEVER = None
+
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -632,7 +661,7 @@ def assess_evidence_sufficiency(
     best = evidence[0]
     primary_items = [
         e for e in evidence
-        if e.source in PRIMARY_SOURCES or (e.url and e.url.startswith("local-pdf://"))
+        if any(ps.lower() in e.source.lower() for ps in PRIMARY_SOURCES) or (e.url and e.url.startswith("local-pdf://"))
     ]
     top_prob = best.cross_encoder_prob
 
@@ -654,7 +683,7 @@ def assess_evidence_sufficiency(
                 if cit_core in re.sub(r"[^a-zA-Z0-9]", "", ev.title + " " + ev.text).lower():
                     citation_found = True
                     break
-        if not citation_found and top_prob < 0.60:
+        if not citation_found:
             return False, (
                 f"Retrieved passages do not explicitly contain the cited legal authority ({', '.join(analysis.citations)}). "
                 "Evidence gate failed to avoid misleading statutory interpretations."
@@ -879,11 +908,14 @@ def run_agent(
             return cand
 
     candidates = _safe_retrieve(retrieval_query, route, 12)
+    local_corpus_urls = {c.get("url") for c in retriever.corpus if c.get("url")}
     effective_allowed = (allowed_sources | {"Indian Kanoon"}) if (allowed_sources and use_live_web) else allowed_sources
     if effective_allowed:
         candidates = [
             item for item in candidates
-            if item.source in effective_allowed or (item.url and item.url.startswith("local-pdf://"))
+            if item.source in effective_allowed
+            or (item.url and item.url in local_corpus_urls)
+            or (item.url and item.url.startswith("local-pdf://"))
         ]
 
     # ── STAGE 5: Assess evidence sufficiency before allowing LLM generation ──
@@ -907,7 +939,9 @@ def run_agent(
         if effective_allowed:
             retry_candidates = [
                 item for item in retry_candidates
-                if item.source in effective_allowed or (item.url and item.url.startswith("local-pdf://"))
+                if item.source in effective_allowed
+                or (item.url and item.url in local_corpus_urls)
+                or (item.url and item.url.startswith("local-pdf://"))
             ]
 
         retry_enough, retry_reason, retry_metrics = assess_evidence_sufficiency(retry_candidates, analysis)

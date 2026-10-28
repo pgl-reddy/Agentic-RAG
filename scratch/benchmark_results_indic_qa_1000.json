@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-10-28T09:28:01.733999+00:00",
+  "suite": "indic_qa",
+  "sample_size": 1000,
+  "seed": 42,
+  "live_web": false,
+  "corpus_records": 1416,
+  "metrics": {
+    "BM25": {
+      "recall_at_5": 0.991,
+      "precision_at_5": 0.6952,
+      "mrr": 0.9798666666666666,
+      "avg_latency_s": 0.011405874490737915,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Dense (FAISS)": {
+      "recall_at_5": 0.933,
+      "precision_at_5": 0.6064,
+      "mrr": 0.8682333333333333,
+      "avg_latency_s": 0.02632000923156738,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Hybrid (RRF)": {
+      "recall_at_5": 0.99,
+      "precision_at_5": 0.671,
+      "mrr": 0.8725999999999999,
+      "avg_latency_s": 0.23814898180961608,
+      "avg_retrieval_attempts": 1.0
+    },
+    "Adaptive Legal RAG": {
+      "recall_at_5": 0.897,
+      "precision_at_5": 0.6412,
+      "mrr": 0.8262166666666667,
+      "avg_latency_s": 0.9298461520671845,
+      "avg_retrieval_attempts": 1.385
+    }
+  }
+}

@@ -19,5 +19,12 @@
     "structure_kind": "constitution",
     "source": "India Code",
     "ingested_at": "2026-08-18T06:37:22.058379+00:00"
+  },
+  "c07a2fe8a42da24c9eced277f04a6daf1c0999de5f13a9ed342d425b3f8e84c4": {
+    "filename": "vocpt-act-1775025002598-522199826.pdf",
+    "chunk_count": 49,
+    "structure_kind": "act",
+    "source": "Uploaded PDF",
+    "ingested_at": "2026-10-27T13:25:48.157610+00:00"
   }
 }

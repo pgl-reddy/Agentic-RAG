@@ -24,7 +24,7 @@ importlib.reload(rag_engine)
 importlib.reload(live_web_searcher)
 
 from rag_engine import LegalRetriever, load_corpus, run_agent, source_summary
-from trusted_sources import ingest_trusted_url
+from trusted_sources import ingest_trusted_url, is_trusted_legal_url
 from pdf_ingestor import DuplicatePDFError, ingest_pdf, preview_pdf
 from pdf_parser import PDFIngestionError
 from vector_store import reset_vector_store_cache
@@ -135,6 +135,8 @@ def render_page_hero(eyebrow: str, title: str, subtitle: str, col_ratio=[1.55, 1
 
 
 def get_source_metadata(item: dict) -> tuple[str, str, str, str]:
+    import urllib.parse
+    import re
     title = item.get("title", "")
     source = item.get("source", "")
     url = item.get("url", "")
@@ -163,9 +165,17 @@ def get_source_metadata(item: dict) -> tuple[str, str, str, str]:
         icon = "article"
 
     if url.startswith("http://") or url.startswith("https://"):
-        open_url = url
+        clean_url = url.rstrip("/")
+        if clean_url in ("https://www.indiacode.nic.in", "http://www.indiacode.nic.in", "https://indiankanoon.org", "http://indiankanoon.org"):
+            clean_title = re.sub(r"\(.*?\)", "", title).strip()
+            query = urllib.parse.quote_plus(clean_title)
+            open_url = f"https://indiankanoon.org/search/?formInput={query}"
+        else:
+            open_url = url
     else:
-        open_url = "https://www.indiacode.nic.in/handle/123456789/1362/simple-search?query=constitution"
+        clean_title = re.sub(r"\(.*?\)", "", title).strip()
+        query = urllib.parse.quote_plus(clean_title) if clean_title else "constitution+of+india"
+        open_url = f"https://indiankanoon.org/search/?formInput={query}"
 
     return category, doc_type, icon, open_url
 
@@ -237,13 +247,14 @@ st.markdown(f"""
   }}
 
   .block-container {{
-    padding-top: 1.2rem !important;
-    padding-bottom: 3.5rem !important;
-    padding-left: 3.5rem !important;
-    padding-right: 3.5rem !important;
-    max-width: 100% !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 4rem !important;
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+    max-width: 1240px !important;
     width: 100% !important;
-    margin: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }}
 
   /* Fonts for headings */
@@ -482,11 +493,80 @@ st.markdown(f"""
         padding: 0.95rem 1.25rem;
         margin-bottom: 0.75rem;
         display: flex;
+        flex-direction: column;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 1px 4px rgba(16, 39, 68, 0.02);
+    }}
+    .source-card-header-row {{
+        display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1.15rem;
-        transition: all 0.2s ease-in-out;
-        box-shadow: 0 1px 4px rgba(16, 39, 68, 0.02);
+        width: 100%;
+    }}
+    .source-chunk-expander {{
+        margin-top: 0.65rem;
+        border-top: 1px dashed #E7DED0;
+        padding-top: 0.45rem;
+        width: 100%;
+    }}
+    .source-chunk-summary {{
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.74rem !important;
+        font-weight: 600 !important;
+        color: #A47B3C !important;
+        cursor: pointer;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.2rem 0;
+        transition: color 0.15s ease;
+    }}
+    .source-chunk-summary:hover {{
+        color: #735A3A !important;
+    }}
+    .source-chunk-body {{
+        margin-top: 0.5rem;
+        background: #FAF7F0;
+        border: 1px solid #E7DED0;
+        border-radius: 6px;
+        padding: 0.85rem 1rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        color: #102744;
+        line-height: 1.6;
+    }}
+    .source-chunk-info-bar {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding-bottom: 0.45rem;
+        margin-bottom: 0.55rem;
+        border-bottom: 1px solid #E7DED0;
+        font-size: 0.72rem;
+        color: #68778A;
+    }}
+    .source-chunk-info-bar code {{
+        background: #EFECE6;
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: #102744;
+        font-size: 0.72rem;
+    }}
+    .source-chunk-text-block {{
+        background: #FFFFFF;
+        border: 1px solid #E7DED0;
+        border-radius: 4px;
+        padding: 0.75rem 0.9rem;
+        margin-top: 0.45rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.80rem;
+        color: #2C3E50;
+        max-height: 240px;
+        overflow-y: auto;
     }}
     .legal-source-card.active-card {{
         border-left: 4px solid #A47B3C !important;
@@ -795,8 +875,8 @@ st.markdown(f"""
     }}
 
     /* 3. Primary Navy "Choose PDF Files" Button (Middle-Bottom) */
-    .st-key-kb_upload_card [data-testid="stFileUploaderDropzone"] button:not([aria-label]),
-    .kb-card [data-testid="stFileUploaderDropzone"] button:not([aria-label]) {{
+    .st-key-kb_upload_card [data-testid="stFileUploaderDropzone"] button:first-of-type,
+    .kb-card [data-testid="stFileUploaderDropzone"] button:first-of-type {{
         background: #102442 !important;
         border: 1px solid #102442 !important;
         border-radius: 6px !important;
@@ -825,8 +905,14 @@ st.markdown(f"""
         display: none !important;
     }}
     /* Render exactly ONE single clean label */
-    .st-key-kb_upload_card [data-testid="stFileUploaderDropzone"] button:not([aria-label])::after,
-    .kb-card [data-testid="stFileUploaderDropzone"] button:not([aria-label])::after {{
+    
+    .st-key-kb_upload_card [data-testid="stFileUploaderDropzone"] button:not(:first-of-type),
+    .kb-card [data-testid="stFileUploaderDropzone"] button:not(:first-of-type) {{
+        display: none !important;
+    }}
+
+    .st-key-kb_upload_card [data-testid="stFileUploaderDropzone"] button:first-of-type::after,
+    .kb-card [data-testid="stFileUploaderDropzone"] button:first-of-type::after {{
         content: "Choose PDF Files" !important;
         display: block !important;
         font-family: 'Inter', sans-serif !important;
@@ -1615,9 +1701,10 @@ st.markdown(f"""
     direction: ltr;
   }}
 
-  @media (max-width: 700px) {{
+  @media (max-width: 900px) {{
     .block-container {{
-      padding: 0.75rem 1rem 1.5rem !important;
+      padding: 1rem 1.25rem 2rem !important;
+      max-width: 100% !important;
     }}
         .home-title {{
             font-size: 1.55rem !important;
@@ -1828,6 +1915,9 @@ if "use_live_web" not in st.session_state:
     st.session_state["use_live_web"] = True
 if "selected_sources" not in st.session_state:
     st.session_state["selected_sources"] = source_options
+else:
+    # Auto-include newly ingested sources so they are immediately active
+    st.session_state["selected_sources"] = sorted(list(set(st.session_state["selected_sources"]) | set(source_options)))
 
 with st.sidebar:
     st.markdown("<h3 style='font-family:\"Playfair Display\",serif; font-size:1.3rem; font-weight:700; margin-bottom:0.75rem; color:#0c1b33;'>⚖ Research Settings</h3>", unsafe_allow_html=True)
@@ -1840,9 +1930,9 @@ with st.sidebar:
     )
     st.session_state["use_live_web"] = use_live_web_sb
     if use_live_web_sb:
-        st.caption("🟢 Live Retrieval Active: Real-time judicial precedents will be retrieved, neural re-ranked, and cited.")
+        st.caption("Live Retrieval Active: Real-time judicial precedents will be retrieved, neural re-ranked, and cited.")
     else:
-        st.caption("⚪ Local Mode: Limited to indexed local corpus chunks.")
+        st.caption("Local Mode: Limited to indexed local corpus chunks.")
 
     selected_sources_sb = st.multiselect(
         "Search these sources",
@@ -1936,10 +2026,11 @@ if selected_page == "Home":
         <style>
           [data-testid="stSidebar"] { display: none !important; }
           .block-container {
-            max-width: 100% !important;
+            max-width: 1240px !important;
             width: 100% !important;
-            padding: 1.2rem 3.5rem 3.5rem !important;
-            margin: 0 !important;
+            padding: 1.5rem 2.5rem 3.5rem !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
           }
         </style>
         """,
@@ -2034,7 +2125,7 @@ elif selected_page == "Research workspace":
             column.button(
                 label,
                 icon=icon,
-                use_container_width=True,
+                width="stretch",
                 key=key,
                 on_click=set_research_question,
                 args=(value,),
@@ -2044,7 +2135,7 @@ elif selected_page == "Research workspace":
             "Research this question",
             type="primary",
             icon=":material/search:",
-            use_container_width=True,
+            width="stretch",
             key="research_question_submit",
         )
 
@@ -2264,8 +2355,13 @@ Core Authority &amp; Synthesis (7-Stage Pipeline Output)
                     st.caption("Relevance signals describe ranking and query overlap; they do not independently authenticate a source.")
                     if is_live:
                         st.markdown(f"**Live Judicial Precedent:** [{item['url']}]({item['url']}) · [View Full Judgment ↗]({item['url']})")
-                    else:
+                    elif str(item.get("url", "")).startswith("http://") or str(item.get("url", "")).startswith("https://"):
                         st.markdown(f"**Open original source:** [{item['url']}]({item['url']})")
+                    else:
+                        import urllib.parse
+                        clean_t = title.split("—")[0].strip() if "—" in title else title.strip()
+                        live_search = f"https://indiankanoon.org/search/?formInput={urllib.parse.quote_plus(clean_t)}"
+                        st.markdown(f"**Live source:** [Search live authority on Indian Kanoon ↗]({live_search}) · *(Vector DB URI: `{item['url']}`)*")
                     st.markdown("**Relevant excerpt**")
                     st.write(item["text"])
 
@@ -2356,7 +2452,7 @@ Core Authority &amp; Synthesis (7-Stage Pipeline Output)
                 memo(research_question, result),
                 file_name=f"nyayaroute-{datetime.now():%Y%m%d-%H%M}.md",
                 mime="text/markdown",
-                use_container_width=True,
+                width="stretch",
             )
 
             # Precedent Heatmap dynamically rendered
@@ -2401,10 +2497,8 @@ elif selected_page == "Source Library":
 
     current_sources = source_summary(load_corpus())
 
-    # Two-column layout: Left (Cards ~69%) and Right (Sidebar ~31%)
-    content_col, sidebar_col = st.columns([2.15, 0.95], gap="large")
-
-    with content_col:
+    # Clean, simplified full-width display of all available sources
+    with st.container():
         # Search and Filter Toolbar
         st.markdown('<div class="source-filter-toolbar">', unsafe_allow_html=True)
         t_col1, t_col2, t_col3, t_col4 = st.columns([5.0, 2.3, 2.3, 1.2], gap="small", vertical_alignment="center")
@@ -2431,7 +2525,7 @@ elif selected_page == "Source Library":
                 key="source_authority_select",
             )
         with t_col4:
-            if st.button("↺ Clear", key="clear_source_filters", use_container_width=True):
+            if st.button("↺ Clear", key="clear_source_filters", width="stretch"):
                 st.session_state.source_search_input = ""
                 st.session_state.source_category_select = "All Categories"
                 st.session_state.source_authority_select = "All Authorities"
@@ -2463,27 +2557,50 @@ elif selected_page == "Source Library":
             for idx, (item, category, doc_type, icon, open_url) in enumerate(filtered_items):
                 is_active = (idx == 0)
                 chunk_text = "1 indexed chunk" if item.get("chunks") == 1 else f"{item.get('chunks', 0)} indexed chunks"
+                
+                # Format chunk excerpts from vector store
+                chunk_texts = item.get("chunk_texts", [])
+                chunks_html = ""
+                if chunk_texts:
+                    for c_idx, c_text in enumerate(chunk_texts):
+                        label = f"Chunk {c_idx + 1}" if len(chunk_texts) > 1 else "Primary Vector DB Chunk"
+                        chunks_html += f'<div class="source-chunk-text-block"><strong>[{label}]</strong><br>{html_escape(c_text)}</div>'
+                else:
+                    chunks_html = '<div class="source-chunk-text-block" style="color:#68778A; font-style:italic;">Chunk text indexed in FAISS vector store.</div>'
+
                 card_html = f"""
                 <div class="legal-source-card {'active-card' if is_active else ''}">
-                    <div class="source-card-left">
-                        <div class="source-card-icon-box">
-                            <span class="material-symbols-outlined">{icon}</span>
-                        </div>
-                        <div class="source-card-details">
-                            <span class="source-badge">{category}</span>
-                            <div class="source-card-title">{html_escape(item['title'])}</div>
-                            <div class="source-card-meta">
-                                <span>{html_escape(item['source'])}</span>
-                                <span class="meta-dot">·</span>
-                                <span>{doc_type}</span>
-                                <span class="meta-dot">·</span>
-                                <span>{chunk_text}</span>
+                    <div class="source-card-header-row">
+                        <div class="source-card-left">
+                            <div class="source-card-icon-box">
+                                <span class="material-symbols-outlined">{icon}</span>
+                            </div>
+                            <div class="source-card-details">
+                                <span class="source-badge">{category}</span>
+                                <div class="source-card-title">{html_escape(item['title'])}</div>
+                                <div class="source-card-meta">
+                                    <span>{html_escape(item['source'])}</span>
+                                    <span class="meta-dot">·</span>
+                                    <span>{doc_type}</span>
+                                    <span class="meta-dot">·</span>
+                                    <span>{chunk_text}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <a href="{open_url}" target="_blank" rel="noopener noreferrer" class="source-card-btn" title="Open source documentation">
-                        Open source ↗
-                    </a>
+                    <details class="source-chunk-expander">
+                        <summary class="source-chunk-summary">
+                            <span class="material-symbols-outlined" style="font-size:15px; vertical-align:middle;">database</span>
+                            <span>View Vector DB Chunk ({chunk_text}) ▾</span>
+                        </summary>
+                        <div class="source-chunk-body">
+                            <div class="source-chunk-info-bar">
+                                <span><strong>Vector Store URI:</strong> <code>{html_escape(str(item.get('url', '')))}</code></span>
+                                <span><strong>Index:</strong> FAISS (all-MiniLM-L6-v2) + BM25 Lexical</span>
+                            </div>
+                            {chunks_html}
+                        </div>
+                    </details>
                 </div>
                 """
                 st.markdown(card_html, unsafe_allow_html=True)
@@ -2499,62 +2616,7 @@ elif selected_page == "Source Library":
                 unsafe_allow_html=True,
             )
 
-    with sidebar_col:
-        st.markdown('<div class="trusted-source-container">', unsafe_allow_html=True)
-        with st.form("ingest_source", clear_on_submit=True):
-            st.markdown(
-                """
-                <span class="material-symbols-outlined" style="color:#A47B3C; font-size:1.85rem; line-height:1; display:block; margin-bottom:0.35rem;">post_add</span>
-                <h3 style="font-family:'Playfair Display', Georgia, serif; font-size:1.35rem; font-weight:700; color:#102744; margin:0 0 0.35rem; line-height:1.25;">Add a Trusted Source</h3>
-                <p style="font-family:'Inter', sans-serif; font-size:0.78rem; line-height:1.45; color:#68778A; margin:0 0 1rem;">
-                    Extend the collection with specific documents from approved legal authorities.
-                </p>
-                """,
-                unsafe_allow_html=True,
-            )
-            source_url = st.text_input(
-                "Specific document URL *",
-                placeholder="https://www.example.gov.in/…",
-                key="ingest_url_input",
-            )
-            display_title = st.text_input(
-                "Optional label / Source title",
-                placeholder="e.g., Supreme Court Judgments, Article 370...",
-                key="ingest_title_input",
-            )
-            submit_source = st.form_submit_button("Add to Source Library →", use_container_width=True)
 
-            st.markdown(
-                """
-                <div style="font-family:'Inter', sans-serif; font-size:0.68rem; line-height:1.45; color:#68778A; margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid #E7DED0;">
-                    <strong style="color:#102744;">Allowed:</strong> India Code, Supreme Court of India, and official High Court portals. The tool is deliberately page-by-page and does not bulk crawl.
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        if submit_source:
-            if not source_url.strip():
-                st.warning("Enter a specific document URL.")
-            else:
-                try:
-                    with st.spinner("Fetching and indexing the trusted source page…"):
-                        count, title = ingest_trusted_url(
-                            source_url.strip(), display_title.strip() or None
-                        )
-                    reset_retriever()
-                    reset_vector_store_cache()
-                    if count:
-                        st.success(
-                            f"Added {count} chunks from: {title}. "
-                            "The source is now indexed in the library."
-                        )
-                        st.rerun()
-                    else:
-                        st.info("That page is already indexed in the local library; no new chunks were added.")
-                except Exception as exc:
-                    st.error(f"Could not add this source: {exc}")
 
 # ──────────────────────────────────────────────────────────────────────────────
 # ──────────────────────────────────────────────────────────────────────────────
@@ -2576,38 +2638,166 @@ elif selected_page == "Knowledge Base":
         col_ratio=[1.55, 1.45],
     )
 
-    with st.container(key="kb_upload_card"):
-        st.markdown(
-            """
-            <div class="kb-header">
-                <div class="kb-icon-title-wrap">
-                    <div class="kb-icon-box">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A8752D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <line x1="10" y1="9" x2="8" y2="9"/>
-                        </svg>
+    kb_tab1, kb_tab2 = st.tabs(["Add Legal PDF Document", "Ingest Trusted Web Source (URL)"])
+
+    with kb_tab1:
+        with st.container(key="kb_upload_card"):
+            st.markdown(
+                """
+                <div class="kb-header">
+                    <div class="kb-icon-title-wrap">
+                        <div class="kb-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A8752D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <line x1="10" y1="9" x2="8" y2="9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="kb-title">Add Legal Documents</div>
+                            <div class="kb-subtitle">Upload official legal PDFs to expand your searchable knowledge base.</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="kb-title">Add Legal Documents</div>
-                        <div class="kb-subtitle">Upload official legal PDFs to expand your searchable knowledge base.</div>
+                    <span class="kb-help-btn" title="Acts, Constitution, judgments, Gazette notifications, Law Commission reports, etc.">?</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            uploaded_files = st.file_uploader(
+                "Upload legal PDF(s)",
+                type=["pdf"],
+                accept_multiple_files=True,
+                label_visibility="collapsed",
+                help="Acts, Constitution, judgments, Gazette notifications, Law Commission reports, etc.",
+            )
+
+    with kb_tab2:
+        st.markdown('<div class="nr-card" style="margin-top:1rem; border-top: 3px solid #A8752D;">', unsafe_allow_html=True)
+        with st.form("ingest_kb_url_form", clear_on_submit=True):
+            st.markdown(
+                """
+                <h3 style="font-family:'Playfair Display', Georgia, serif; font-size:1.25rem; font-weight:700; color:#102442; margin:0 0 0.35rem;">
+                    Ingest Official Legal Website
+                </h3>
+                <p style="font-family:'Inter', sans-serif; font-size:0.84rem; color:#4A5568; margin:0 0 1rem;">
+                    Fetch, chunk, and embed authoritative statutes or reported judicial rulings directly into the RAG vector store.
+                </p>
+                """,
+                unsafe_allow_html=True,
+            )
+            kb_source_url = st.text_input(
+                "Official Document URL *",
+                placeholder="https://www.indiacode.nic.in/... or https://indiankanoon.org/doc/...",
+                key="kb_url_input",
+            )
+            kb_display_title = st.text_input(
+                "Optional Title / Enactment Name",
+                placeholder="e.g. Information Technology Act, 2000, Section 66A",
+                key="kb_title_input",
+            )
+            kb_submit_url = st.form_submit_button("⚡ Ingest Web Authority →", width="stretch")
+
+            st.markdown(
+                """
+                <div style="font-size:0.75rem; color:#718096; line-height:1.45; margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid #E2E8F0;">
+                    <strong>Allowed Domains:</strong> Official Government Ministries & Portals (<code>*.gov.in</code>, <code>*.nic.in</code>), India Code (<code>indiacode.nic.in</code>), Supreme Court of India (<code>sci.gov.in</code>), Indian Kanoon (<code>indiankanoon.org</code>), and High Courts (<code>*.hc.gov.in</code>). Supports both HTML legal pages and direct PDF gazettes.
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        if kb_submit_url:
+            if not kb_source_url.strip():
+                st.warning("Please enter a valid document URL.")
+            elif not is_trusted_legal_url(kb_source_url.strip()):
+                st.error("Only verified government and court domains are permitted.")
+            else:
+                try:
+                    with st.spinner("Fetching, parsing, and embedding web authority into knowledge base…"):
+                        count, title = ingest_trusted_url(kb_source_url.strip(), kb_display_title.strip() or None)
+                        reset_retriever()
+                        reset_vector_store_cache()
+                        # Auto-update active search sources so this new authority is queried immediately
+                        new_corpus = load_corpus()
+                        all_sources = sorted({item["source"] for item in new_corpus})
+                        st.session_state["selected_sources"] = all_sources
+                        st.session_state["kb_last_ingested_url_data"] = {
+                            "url": kb_source_url.strip(),
+                            "title": title,
+                            "count": count,
+                        }
+                        if count:
+                            st.success(f"✓ Successfully retrieved and indexed {count} chunks for: **{title}**! The document is now active in the knowledge base.")
+                        else:
+                            st.info("That document is already indexed in the local knowledge base.")
+                except Exception as exc:
+                    st.error(f"Could not ingest web authority: {exc}")
+
+        # Render preview and action buttons for the ingested URL
+        last_url_data = st.session_state.get("kb_last_ingested_url_data")
+        if last_url_data:
+            ingested_url = last_url_data["url"]
+            ingested_title = last_url_data["title"]
+            ingested_count = last_url_data["count"]
+            st.markdown(
+                f"""
+                <div style="background: linear-gradient(135deg, #FFFDF9 0%, #FBF8F1 100%); border: 1.5px solid #D8BD91; border-left: 4.5px solid #A8752D; border-radius: 8px; padding: 1.3rem 1.6rem; margin: 1.2rem 0; box-shadow: 0 3px 12px rgba(168, 117, 45, 0.09);">
+                    <div style="display:flex; align-items:flex-start; gap: 1rem;">
+                        <span style="font-size: 2rem; line-height: 1;"></span>
+                        <div>
+                            <div style="font-family:'Playfair Display', Georgia, serif; font-size:1.25rem; font-weight:700; color:#102442; margin-bottom:0.35rem;">
+                                Official Legal Authority Active in Knowledge Base
+                            </div>
+                            <div style="font-family:'Inter', sans-serif; font-size:0.9rem; color:#4A5568; line-height:1.5;">
+                                <strong>{html_escape(ingested_title)}</strong> (<code>{html_escape(ingested_url)}</code>) is indexed with {ingested_count} chunks in the FAISS vector database. The legal AI agent will actively retrieve and cite this authority during research.
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <span class="kb-help-btn" title="Acts, Constitution, judgments, Gazette notifications, Law Commission reports, etc.">?</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                """,
+                unsafe_allow_html=True,
+            )
 
-        uploaded_files = st.file_uploader(
-            "Upload legal PDF(s)",
-            type=["pdf"],
-            accept_multiple_files=True,
-            label_visibility="collapsed",
-            help="Acts, Constitution, judgments, Gazette notifications, Law Commission reports, etc.",
-        )
+            # Show chunks from this URL
+            c_file = Path(__file__).resolve().parent / "data" / "legal_corpus.jsonl"
+            url_chunks = []
+            if c_file.exists():
+                for line in c_file.read_text(encoding="utf-8").splitlines():
+                    if line.strip():
+                        try:
+                            rec = json.loads(line)
+                            if rec.get("url") == ingested_url:
+                                url_chunks.append(rec)
+                        except Exception:
+                            pass
+
+            if url_chunks:
+                with st.expander(f"🔍 Preview Retrieved & Embedded Chunks ({len(url_chunks)} chunks)", expanded=True):
+                    for c_idx, c_rec in enumerate(url_chunks, 1):
+                        st.markdown(f"**Chunk {c_idx}** — *{html_escape(c_rec.get('title', ''))}*")
+                        st.text_area(
+                            f"Content [{c_rec.get('id', '')}]",
+                            c_rec.get("text", ""),
+                            height=120,
+                            key=f"kb_url_chunk_{c_idx}_{c_rec.get('id', '')}",
+                            disabled=True,
+                        )
+                        st.markdown("---")
+
+            col_btn1, col_btn2 = st.columns([2, 1], gap="medium")
+            with col_btn1:
+                if st.button("Query this Source in Research Workspace", type="primary", key="nav_to_research_url"):
+                    st.session_state["main_navigation"] = "Research workspace"
+                    st.session_state["research_question"] = f"What are the key legal provisions in {ingested_title}?"
+                    st.rerun()
+            with col_btn2:
+                if st.button("Refresh View", key="refresh_url_view"):
+                    st.rerun()
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
     if uploaded_files:
         st.markdown('<div class="kb-outer-container" style="margin-top: 1.5rem;">', unsafe_allow_html=True)
@@ -2622,16 +2812,16 @@ elif selected_page == "Knowledge Base":
 
             if f"indexed_result_{file_hash}" not in st.session_state:
                 with st.status(f"⚡ Integrating '{uploaded_file.name}' into RAG Knowledge Base…", expanded=True) as status_box:
-                    st.write("📄 **1. Extracting Document Pages:** Reading and cleaning raw text via PyPDF…")
+                    st.write("**1. Extracting Document Pages:** Reading and cleaning raw text via PyPDF…")
                     try:
-                        st.write("⚖️ **2. Structural Legal Chunking:** Detecting Parts, Chapters, Sections, and Articles…")
+                        st.write("**2. Structural Legal Chunking:** Detecting Parts, Chapters, Sections, and Articles…")
                         ingest_res = ingest_pdf(file_bytes, uploaded_file.name)
 
-                        st.write("🧠 **3. Neural Embedding & FAISS:** Indexing 384-dimensional dense vectors…")
+                        st.write("**3. Neural Embedding & FAISS:** Indexing 384-dimensional dense vectors…")
                         reset_retriever()
                         reset_vector_store_cache()
 
-                        st.write("🔄 **4. Retriever Synchronization:** Refreshing BM25 lexical index and RAG cache…")
+                        st.write("**4. Retriever Synchronization:** Refreshing BM25 lexical index and RAG cache…")
                         if "selected_sources" in st.session_state:
                             st.session_state["selected_sources"] = sorted(
                                 list(set(st.session_state["selected_sources"]) | {ingest_res.doc_profile.source})
@@ -2651,9 +2841,9 @@ elif selected_page == "Knowledge Base":
                             "filename": uploaded_file.name,
                             "is_duplicate": True,
                         }
-                        status_box.update(label=f"ℹ️ '{uploaded_file.name}' is already active in Knowledge Base", state="complete", expanded=False)
+                        status_box.update(label=f"'{uploaded_file.name}' is already active in Knowledge Base", state="complete", expanded=False)
                     except Exception as exc:
-                        status_box.update(label=f"❌ Error indexing '{uploaded_file.name}'", state="error", expanded=True)
+                        status_box.update(label=f"Error indexing '{uploaded_file.name}'", state="error", expanded=True)
                         st.error(f"Could not process PDF: {exc}")
                         continue
             else:
@@ -2666,7 +2856,7 @@ elif selected_page == "Knowledge Base":
                     f"""
                     <div style="background: linear-gradient(135deg, #FFFDF9 0%, #FBF8F1 100%); border: 1.5px solid #D8BD91; border-left: 4.5px solid #A8752D; border-radius: 8px; padding: 1.3rem 1.6rem; margin: 1.2rem 0; box-shadow: 0 3px 12px rgba(168, 117, 45, 0.09);">
                         <div style="display:flex; align-items:flex-start; gap: 1rem;">
-                            <span style="font-size: 2rem; line-height: 1;">🎉</span>
+                            <span style="font-size: 2rem; line-height: 1;"></span>
                             <div>
                                 <div style="font-family:'Playfair Display', Georgia, serif; font-size:1.25rem; font-weight:700; color:#102442; margin-bottom:0.35rem;">
                                     Thank You for Contributing to the NyayaRoute Knowledge Base!
@@ -2685,7 +2875,7 @@ elif selected_page == "Knowledge Base":
                     f"""
                     <div style="background: #FBF8F1; border: 1.5px solid #D8BD91; border-left: 4.5px solid #102442; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.2rem 0;">
                         <div style="display:flex; align-items:flex-start; gap: 0.9rem;">
-                            <span style="font-size: 1.8rem; line-height: 1;">📚</span>
+                            <span style="font-size: 1.8rem; line-height: 1;"></span>
                             <div>
                                 <div style="font-family:'Playfair Display', Georgia, serif; font-size:1.2rem; font-weight:700; color:#102442; margin-bottom:0.3rem;">
                                     Knowledge Source Active & Grounded
@@ -2707,7 +2897,7 @@ elif selected_page == "Knowledge Base":
                     uploaded_file.name,
                 )
 
-                st.markdown(f"#### 📋 Extracted Document Information — `{uploaded_file.name}`")
+                st.markdown(f"####Extracted Document Information — `{uploaded_file.name}`")
 
                 metadata_col1, metadata_col2 = st.columns(2)
                 with metadata_col1:
@@ -2753,7 +2943,7 @@ elif selected_page == "Knowledge Base":
                 # ── Action Navigation: Direct Jump to Research Workspace ────────
                 col_btn1, col_btn2 = st.columns([2, 1], gap="medium")
                 with col_btn1:
-                    if st.button("⚖️ Query this Document in Research Workspace", type="primary", key=f"nav_to_research_{uploaded_file.name}_{file_hash}"):
+                    if st.button("Query this Document in Research Workspace", type="primary", key=f"nav_to_research_{uploaded_file.name}_{file_hash}"):
                         st.session_state["main_navigation"] = "Research workspace"
                         st.rerun()
                 with col_btn2:
@@ -2772,26 +2962,28 @@ elif selected_page == "Knowledge Base":
 
     from pathlib import Path
     import json
-    pdf_corpus_file = Path(__file__).resolve().parent / "data" / "pdf_legal_corpus.jsonl"
-    if pdf_corpus_file.exists():
-        pdf_docs = {}
-        for line in pdf_corpus_file.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                try:
-                    r = json.loads(line)
-                    fn = r.get("filename") or "Unknown Document"
-                    if fn not in pdf_docs:
-                        pdf_docs[fn] = {
-                            "filename": fn,
-                            "title": r.get("act") or r.get("title") or fn,
-                            "source": r.get("source") or "Uploaded PDF",
-                            "kind": r.get("structure_kind") or r.get("kind") or "Document",
-                            "chunks": 0,
-                            "ingested_at": r.get("ingested_at", "")[:10] if r.get("ingested_at") else "N/A",
-                        }
-                    pdf_docs[fn]["chunks"] += 1
-                except Exception:
-                    continue
+    data_dir = Path(__file__).resolve().parent / "data"
+    pdf_docs = {}
+    for corpus_filename in ("pdf_legal_corpus.jsonl", "legal_corpus.jsonl"):
+        c_file = data_dir / corpus_filename
+        if c_file.exists():
+            for line in c_file.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    try:
+                        r = json.loads(line)
+                        fn = r.get("filename") or r.get("title") or "Document"
+                        if fn not in pdf_docs:
+                            pdf_docs[fn] = {
+                                "filename": fn,
+                                "title": r.get("act") or r.get("title") or fn,
+                                "source": r.get("source") or ("Uploaded PDF" if "pdf" in corpus_filename else "Ingested Web URL"),
+                                "kind": r.get("structure_kind") or r.get("kind") or "Document",
+                                "chunks": 0,
+                                "ingested_at": r.get("ingested_at", "")[:10] if r.get("ingested_at") else "N/A",
+                            }
+                        pdf_docs[fn]["chunks"] += 1
+                    except Exception:
+                        continue
         if pdf_docs:
             doc_rows = []
             for doc in pdf_docs.values():
@@ -2806,7 +2998,7 @@ elif selected_page == "Knowledge Base":
             try:
                 st.dataframe(doc_rows, width="stretch", hide_index=True)
             except Exception:
-                st.dataframe(doc_rows, use_container_width=True, hide_index=True)
+                st.dataframe(doc_rows, width="stretch", hide_index=True)
         else:
             st.info("No PDF documents have been indexed yet. Upload a PDF above to expand the knowledge base.")
     else:
